@@ -5,22 +5,23 @@ namespace Program
 {
     public class DataUnit
     {
-        public string id;
-        public List<KeyValuePair<string, object>> fields;
+        public string Id { get; }
+        public Dictionary<string, object> Props { get; set; }
 
         public DataUnit(string id)
         {
-            this.id = id;
-            this.fields = new List<KeyValuePair<string, object>>();
+            Id = id;
+            Props = new Dictionary<string, object>();
         }
+
         public override bool Equals(object obj)
         {
             return obj is DataUnit unit &&
-                   id == unit.id;
+                   Id == unit.Id;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(id);
+            return HashCode.Combine(Id);
         }
     }
 }

@@ -1,31 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Program
 {
     public class Collection
     {
-        public string id;
-        public string name;
-        public Dictionary<DataType, List<DataUnit>> dataUnits;
+        public string Id { get; }
+        public string Name { get; }
+        public Dictionary<DataType, HashSet<DataUnit>> DataUnits { get; }
 
         public Collection(string id, string name)
         {
-            this.id = id;
-            this.name = name;
-            this.dataUnits = new Dictionary<DataType, List<DataUnit>>();
+            Id = id;
+            Name = name;
+            DataUnits = new Dictionary<DataType, HashSet<DataUnit>>();
         }
 
         public override bool Equals(object obj)
         {
             return obj is Collection collection &&
-                   id == collection.id &&
-                   name == collection.name;
+                   Id == collection.Id &&
+                   Name == collection.Name;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(id, name);
+            return HashCode.Combine(Id, Name);
         }
     }
 }
