@@ -8,7 +8,7 @@ namespace Program
     {
         public string Id { get; }
         public string Name { get; }
-        public Dictionary<DataType, HashSet<DataUnit>> DataUnits { get; }
+        public SortedSet<DataUnit> DataUnits { get; }
 
         public Collection(string id, string name)
         {

@@ -6,12 +6,17 @@ namespace Program
     public class DataUnit
     {
         public string Id { get; }
-        public Dictionary<string, object> Props { get; set; }
+        public SortedSet<DataUnitProp> Props { get; set; }
 
         public DataUnit(string id)
         {
             Id = id;
-            Props = new Dictionary<string, object>();
+            Props = new SortedSet<DataUnitProp>();
+        }
+
+        public DataUnitProp GetProperty(string name)
+        {
+            return Props.FirstOrDefault(prop => prop.Name == name);
         }
 
         public override bool Equals(object obj)
