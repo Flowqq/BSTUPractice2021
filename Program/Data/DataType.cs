@@ -4,8 +4,8 @@
     {
         Integer,
         Double,
+        Array,
         String,
-        Date,
         Reference,
         Object
     }
