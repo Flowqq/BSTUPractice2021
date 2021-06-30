@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Program.DataPage;
 
 namespace Program.userInterface
 {
@@ -8,6 +8,6 @@ namespace Program.userInterface
         bool SaveDataUnit(string collectionId, DataUnit dataUnit);
         bool UpdateDataUnit(string collectionId, DataUnit dataUnit);
         bool DeleteDataUnit(string collectionId, string dataUnitId);
-        SortedSet<DataUnit> SearchDataUnits(string collectionId, SortedSet<DataUnit> searchFields);
+        DataUnitsPaginator GetCollection(string collectionId);
     }
 }
