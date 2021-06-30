@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Program
 {
@@ -14,7 +13,7 @@ namespace Program
         {
             Id = id;
             Name = name;
-            DataUnits = new Dictionary<DataType, HashSet<DataUnit>>();
+            DataUnits = new SortedSet<DataUnit>();
         }
 
         public override bool Equals(object obj)
