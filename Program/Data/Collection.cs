@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Program
 {
@@ -14,6 +14,54 @@ namespace Program
             Id = id;
             Name = name;
             DataUnits = new SortedSet<DataUnit>();
+        }
+
+        public bool AddDataUnit(DataUnit dataUnit)
+        {
+            return DataUnits.Add(dataUnit);
+        }
+
+        public void RemoveDataUnit(string dataUnitId)
+        {
+            var dataUnitToRemove = FindDataUnitById(dataUnitId);
+            if (dataUnitToRemove != null)
+            {
+                DataUnits.Remove(dataUnitToRemove);
+            }
+        }
+
+        public bool UpdateDataUnit(DataUnit dataUnit)
+        {
+            var dataUnitToUpdate = FindDataUnitById(dataUnit.Id);
+            if (dataUnitToUpdate != null)
+            {
+                return dataUnitToUpdate.Update(dataUnit);
+            }
+            return false;
+        }
+
+        public SortedSet<DataUnit> SearchDataUnits(SortedSet<DataUnitProp> searchProps)
+        {
+            var resultSet = new SortedSet<DataUnit>();
+            foreach (var dataUnit in DataUnits)
+            {
+                var matches = searchProps.All(searchField => dataUnit.GetProperty(searchField.Name).Value.Equals(searchField.Value));
+                if (matches)
+                {
+                    resultSet.Add(dataUnit);
+                }
+            }
+            return resultSet;
+        }
+
+        public DataUnit FindDataUnitById(string dataUnitId)
+        {
+            return DataUnits.FirstOrDefault(dataUnit => dataUnit.Id == dataUnitId);
+        }
+
+        protected bool Equals(Collection other)
+        {
+            return Id == other.Id;
         }
 
         public override bool Equals(object obj)
