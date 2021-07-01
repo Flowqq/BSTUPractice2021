@@ -18,14 +18,15 @@ namespace Program
 
         public override bool Equals(object obj)
         {
-            return obj is Collection collection &&
-                   Id == collection.Id &&
-                   Name == collection.Name;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Collection) obj);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Name);
+            return (Id != null ? Id.GetHashCode() : 0);
         }
     }
 }

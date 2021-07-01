@@ -22,12 +22,14 @@ namespace Program
 
         public override bool Equals(object obj)
         {
-            return obj is DataUnit unit &&
-                   Id == unit.Id;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((DataUnit) obj);
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id);
+            return (Id != null ? Id.GetHashCode() : 0);
         }
     }
 }
