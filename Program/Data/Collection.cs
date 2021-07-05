@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Program
@@ -8,6 +9,11 @@ namespace Program
         public string Id { get; }
         public string Name { get; }
         public SortedSet<DataUnit> DataUnits { get; }
+
+        public CollectionDefinition Definition
+        {
+            get => new CollectionDefinition(Id, Name, DataUnits.Count);
+        }
 
         public Collection(string id, string name)
         {
@@ -30,12 +36,13 @@ namespace Program
             }
         }
 
-        public bool UpdateDataUnit(DataUnit dataUnit)
+        public bool UpdateDataUnit(string dataUnitId, SortedSet<DataUnitProp> updatedProps)
         {
-            var dataUnitToUpdate = FindDataUnitById(dataUnit.Id);
+            var dataUnitToUpdate = FindDataUnitById(dataUnitId);
             if (dataUnitToUpdate != null)
             {
-                return dataUnitToUpdate.Update(dataUnit);
+                dataUnitToUpdate.Update(updatedProps);
+                return true;
             }
             return false;
         }
@@ -57,6 +64,17 @@ namespace Program
         public DataUnit FindDataUnitById(string dataUnitId)
         {
             return DataUnits.FirstOrDefault(dataUnit => dataUnit.Id == dataUnitId);
+        }
+
+        public List<byte> GetDefinitionBytes()
+        {
+            var bytes = new List<byte>();
+            var idBytes = DataTypeUtils.StringToBytes(Id);
+            bytes.AddRange(idBytes);
+            var nameBytes = DataTypeUtils.StringToBytes(Name);
+            bytes.AddRange(nameBytes);
+            bytes.Add(Convert.ToByte(DataUnits.Count));
+            return bytes;
         }
 
         protected bool Equals(Collection other)

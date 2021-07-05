@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Program
@@ -14,23 +15,19 @@ namespace Program
             Props = new SortedSet<DataUnitProp>();
         }
 
-        public bool Update(DataUnit newDataUnit)
+        public void Update(SortedSet<DataUnitProp> updatedProps)
         {
-            if (newDataUnit.Id == Id)
+            foreach (var prop in updatedProps)
             {
-                foreach (var prop in newDataUnit.Props)
+                if (!Props.Contains(prop))
                 {
-                    if (!Props.Contains(prop))
-                    {
-                        AddProperty(prop);
-                    }
-                    else
-                    {
-                        UpdateProperty(prop);
-                    }
+                    AddProperty(prop);
+                }
+                else
+                {
+                    UpdateProperty(prop);
                 }
             }
-            return false;
         }
 
         public DataUnitProp GetProperty(string name)
@@ -41,6 +38,13 @@ namespace Program
         public bool AddProperty(DataUnitProp dataUnitProp)
         {
             return Props.Add(dataUnitProp);
+        }
+        public void AddProperties(HashSet<DataUnitProp> dataUnitProps)
+        {
+            foreach (var dataUnit in dataUnitProps)
+            {
+                Props.Add(dataUnit);
+            }
         }
 
         public bool UpdateProperty(DataUnitProp dataUnitProp)
