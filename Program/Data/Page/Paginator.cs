@@ -3,22 +3,25 @@ using System.Collections.Generic;
 
 namespace Program.DataPage
 {
-    public class Paginator<T, TV> where T : Page<TV> where TV : ICollection
+    public abstract class Paginator<T> : IEnumerator<T>
     {
-        public TV CurrentPageData { get => GetCurrentPageData(); }
-        protected List<T> DataPages { get; }
+        public T Current { get; }
+        object IEnumerator.Current => GetCurrentPageData();
+        protected List<T> DataPages { get; set; }
         public int CurrentPageNumber { get; protected set; }
-        public int TotalPages { get; }
-        
-        public Paginator(int totalPages, List<T> dataPages)
+        public int TotalPages { get; set; }
+        public int PageSize { get; }
+
+        public Paginator(int pageSize)
         {
-            DataPages = dataPages;
+            DataPages = new List<T>();
             CurrentPageNumber = 0;
-            TotalPages = totalPages;
+            PageSize = pageSize;
+            TotalPages = 0;
         }
-        protected TV GetCurrentPageData()
+        protected T GetCurrentPageData()
         {
-            return DataPages[CurrentPageNumber].PageData;
+            return DataPages[CurrentPageNumber];
         }
         public bool MoveNext()
         {
@@ -28,6 +31,17 @@ namespace Program.DataPage
                 return true;
             }
             return false;
+        }
+
+        public void Reset()
+        {
+            CurrentPageNumber = 0;
+        }
+
+        public void Dispose()
+        {
+            CurrentPageNumber = -1;
+            DataPages = new List<T>(0);
         }
     }
 }

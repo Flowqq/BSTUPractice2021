@@ -6,6 +6,7 @@ namespace Program.DataPage
     {
         public DataUnitsPage(SortedSet<DataUnit> pageData) : base(pageData)
         {
+            Items = pageData.Count;
         }
     }
 }
