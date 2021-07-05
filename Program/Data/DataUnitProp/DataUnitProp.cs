@@ -1,18 +1,17 @@
 ﻿namespace Program
 {
-    public class DataUnitProp
+    public abstract class DataUnitProp
     {
         public string Name { get; }
         public object Value { get; }
-        public DataType DataType { get; }
-        
-        public DataUnitProp(string name, object value, DataType dataType)
+        public DataType Type { get; }
+
+        public DataUnitProp(string name, object value, DataType type)
         {
             Name = name;
             Value = value;
-            DataType = dataType;
+            Type = type;
         }
-
         protected bool Equals(DataUnitProp other)
         {
             return Name == other.Name;

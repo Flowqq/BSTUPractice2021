@@ -4,9 +4,13 @@
     {
         Integer,
         Double,
-        Array,
         String,
         Reference,
-        Object
+        Object,
+        IntArray,
+        DoubleArray,
+        StringArray,
+        RefArray,
+        ObjArray
     }
 }
