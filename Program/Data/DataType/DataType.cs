@@ -5,7 +5,6 @@
         Integer,
         Double,
         String,
-        Reference,
         Object,
         IntArray,
         DoubleArray,
