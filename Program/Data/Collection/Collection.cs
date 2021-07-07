@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Program
@@ -64,17 +63,6 @@ namespace Program
         public DataUnit FindDataUnitById(string dataUnitId)
         {
             return DataUnits.FirstOrDefault(dataUnit => dataUnit.Id == dataUnitId);
-        }
-
-        public List<byte> GetDefinitionBytes()
-        {
-            var bytes = new List<byte>();
-            var idBytes = DataTypeUtils.StringToBytes(Id);
-            bytes.AddRange(idBytes);
-            var nameBytes = DataTypeUtils.StringToBytes(Name);
-            bytes.AddRange(nameBytes);
-            bytes.Add(Convert.ToByte(DataUnits.Count));
-            return bytes;
         }
 
         protected bool Equals(Collection other)
