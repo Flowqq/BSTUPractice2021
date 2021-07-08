@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Program.DataPage;
 
 namespace Program
 {
@@ -12,6 +13,10 @@ namespace Program
         public CollectionDefinition Definition
         {
             get => new CollectionDefinition(Id, Name, DataUnits.Count);
+        }
+        public DataUnitsPaginator GetDataPaginator(int pageSize)
+        {
+            return new DataUnitsPaginator(pageSize, new List<DataUnit>(DataUnits));
         }
 
         public Collection(string id, string name)
@@ -64,7 +69,6 @@ namespace Program
         {
             return DataUnits.FirstOrDefault(dataUnit => dataUnit.Id == dataUnitId);
         }
-
         protected bool Equals(Collection other)
         {
             return Id == other.Id;
