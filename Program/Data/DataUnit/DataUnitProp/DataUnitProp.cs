@@ -1,6 +1,6 @@
 ﻿namespace Program
 {
-    public abstract class DataUnitProp
+    public abstract class DataUnitProp : IComparable
     {
         public string Name { get; }
         public object Value { get; }
@@ -26,6 +26,19 @@
         public override int GetHashCode()
         {
             return (Name != null ? Name.GetHashCode() : 0);
+        }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj != null)
+            {
+                var val = (DataUnitProp) obj;
+                return Name.CompareTo(val.Name);
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }

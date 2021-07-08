@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Program
 {
-    public class DataUnit
+    public class DataUnit : IComparable
     {
         public string Id { get; }
         public SortedSet<DataUnitProp> Props { get; }
@@ -79,6 +79,19 @@ namespace Program
         public override int GetHashCode()
         {
             return (Id != null ? Id.GetHashCode() : 0);
+        }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj != null)
+            {
+                var val = (DataUnit) obj;
+                return Id.CompareTo(val.Id);
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }
