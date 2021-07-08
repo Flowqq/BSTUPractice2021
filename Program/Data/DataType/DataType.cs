@@ -2,6 +2,7 @@
 {
     public enum DataType
     {
+        // ДОБАВЛЯТЬ ТОЛЬКО В КОНЕЦ!!!
         Integer,
         Double,
         String,
