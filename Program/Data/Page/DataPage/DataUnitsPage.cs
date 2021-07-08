@@ -2,11 +2,10 @@
 
 namespace Program.DataPage
 {
-    public class DataUnitsPage : Page<SortedSet<DataUnit>>
+    public class DataUnitsPage : Page<DataUnit>
     {
-        public DataUnitsPage(SortedSet<DataUnit> pageData) : base(pageData)
+        public DataUnitsPage(List<DataUnit> pageData) : base(pageData)
         {
-            Items = pageData.Count;
         }
     }
 }

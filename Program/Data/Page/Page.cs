@@ -1,16 +1,21 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 
 namespace Program.DataPage
 {
-    public class Page<T> where T : ICollection
+    public class Page<T>
     {
-        public T PageData { get; }
-        public int Items { get; protected set; }
+        public List<T> PageData { get; }
+        public int Items { get; }
 
-        public Page(T pageData)
+        public Page(List<T> pageData)
         {
-            Items = 0;
+            Items = pageData.Count;
             PageData = pageData;
+        }
+
+        public void AddItem(T item)
+        {
+            PageData.Add(item);
         }
     }
 }

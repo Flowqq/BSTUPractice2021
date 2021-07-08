@@ -8,13 +8,25 @@ namespace Program.DataPage
         {
             CurrentPageNumber = 0;
             TotalPages = dataPages.Count / pageSize;
-            int index = 0;
-            for (int i = 0; i < TotalPages; i++)
+            var index = 0;
+            for (var i = 0; i < TotalPages; i++)
             {
-                var a = new List<int>();
-                var newPage = new DataUnitsPage(new SortedSet<DataUnit>(dataPages.GetRange(index, pageSize)));
+                var newPage = new DataUnitsPage(new List<DataUnit>(dataPages.GetRange(index, pageSize)));
                 index += pageSize;
                 DataPages.Add(newPage);
+            }
+        }
+
+        public void AddNewItem(DataUnit dataUnit)
+        {
+            if (DataPages[TotalPages].Items == PageSize)
+            {
+                var newPage = new DataUnitsPage(new List<DataUnit>() {dataUnit});
+                DataPages.Add(newPage);
+            }
+            else
+            {
+                DataPages[TotalPages].AddItem(dataUnit);
             }
         }
     }
