@@ -23,7 +23,6 @@ namespace Program
         public MainWindow()
         {
             InitializeComponent();
-            CollectionsList.Items.Add(new TextBlock { Text = "Collection" });
         }
 
         private void CollectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -31,10 +30,9 @@ namespace Program
 
         }
 
-        //пока не работает почему-то
-        private void CreateCollection_Click(object sender, MouseButtonEventArgs e)
+        private void CreateCollectionButton_Click(object sender, RoutedEventArgs e)
         {
-            CollectionsList.Items.Add(new TextBlock { Text = "Collection", FontSize=17 });
+            CollectionsList.Items.Add(new TextBlock { Text = "Collection", FontSize = 17, Height = 32, Width = 582, Padding = new Thickness(10,0,0,0) });;
         }
     }
 }
