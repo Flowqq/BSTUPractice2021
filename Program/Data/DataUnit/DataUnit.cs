@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Program
@@ -13,7 +15,11 @@ namespace Program
             Id = id;
             Props = new SortedSet<DataUnitProp>();
         }
-
+        public DataUnit(string id, SortedSet<DataUnitProp> props)
+        {
+            Id = id;
+            Props = props;
+        }
         public void Update(SortedSet<DataUnitProp> updatedProps)
         {
             foreach (var prop in updatedProps)
@@ -55,8 +61,8 @@ namespace Program
             var propToUpdate = GetProperty(name);
             if (propToUpdate != null)
             {
-                bool removed = Props.Remove(propToUpdate);
-                bool added = Props.Add(dataUnitProp);
+                var removed = Props.Remove(propToUpdate);
+                var added = Props.Add(dataUnitProp);
                 if (!added)
                 {
                     Props.Add(propToUpdate);
@@ -64,6 +70,32 @@ namespace Program
                 return removed && added;
             }
             return false;
+        }
+
+        public List<byte> Serialize()
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(SerializeUtils.StringToBytes(Id));
+            var propsCount = Props.Count;
+            bytes.Add(SerializeUtils.IntToByte(propsCount));
+            foreach (var prop in Props)
+            {
+                bytes.AddRange(prop.Serialize());
+            }
+            return bytes;
+        }
+
+        public static DataUnit Deserialize(FileStream fileStream)
+        {
+            var id = SerializeUtils.ReadNextString(fileStream);
+            var propsCount = SerializeUtils.ReadNextInt(fileStream);
+            var props = new SortedSet<DataUnitProp>();
+            for (var i = 0; i < propsCount; i++)
+            {
+                var prop = DataUnitPropFactory.DeserializeDataUnit(fileStream);
+                props.Add(prop);
+            }
+            return new DataUnit(id, props);
         }
         protected bool Equals(DataUnit other)
         {
