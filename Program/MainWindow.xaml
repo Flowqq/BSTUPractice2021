@@ -5,14 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Program"
         mc:Ignorable="d"
-        Title="Data Base" Height="800" Width="600" WindowStyle="ThreeDBorderWindow">
+        Title="Data Base" Height="700" Width="600" WindowStyle="ThreeDBorderWindow">
     <Grid>
         <Button x:Name="CreateCollectionButton" Content="Create collection" HorizontalAlignment="Left" Margin="428,21,0,0" VerticalAlignment="Top" Height="39" Width="139" FontSize="16" Click="CreateCollectionButton_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="33,21,0,0" Text="Collections" TextWrapping="Wrap" VerticalAlignment="Top" Height="39" Width="118" FontSize="22"/>
         <ListBox x:Name="CollectionsList" Margin="0,77,0,0" BorderBrush="{x:Null}" MouseDoubleClick="CollectionsList_MouseDoubleClick">
-            <TextBlock Text="Collection 1" Height="32" Width="582" FontSize="17" Padding="10,0,0,0" />
-
-
+            
         </ListBox>
 
 

@@ -32,7 +32,26 @@ namespace Program
 
         private void CreateCollectionButton_Click(object sender, RoutedEventArgs e)
         {
-            CollectionsList.Items.Add(new TextBlock { Text = "Collection", FontSize = 17, Height = 32, Width = 582, Padding = new Thickness(10,0,0,0) });;
+            TextBox tb = new TextBox
+            {
+                //Text = "Collection 1",
+                FontSize = 17,
+                Height = 32,
+                Width = 242,
+                Padding = new Thickness(5, 0, 0, 0)
+            };
+            tb.LostFocus += new RoutedEventHandler(TextBoxClosing);
+
+            CollectionsList.Items.Add(tb);
+        }
+
+        private void TextBoxClosing(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            string collectionName = tb.Text;
+            CollectionsList.Items.Remove(tb);
+            CollectionsList.Items.Add(new TextBlock { Text = collectionName, FontSize = 17, Height = 32,
+                Width = 560, Padding = new Thickness(10, 0, 0, 0) });
         }
     }
 }
