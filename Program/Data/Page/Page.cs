@@ -2,20 +2,31 @@
 
 namespace Program.DataPage
 {
-    public class Page<T>
+    public abstract class Page<T>
     {
-        public List<T> PageData { get; }
+        public List<T> _pageData = new List<T>();
+
+        public List<T> PageData
+        {
+            get => GetData();
+        }
+
         public int Items { get; }
 
         public Page(List<T> pageData)
         {
             Items = pageData.Count;
-            PageData = pageData;
+            _pageData = pageData;
         }
 
         public void AddItem(T item)
         {
             PageData.Add(item);
+        }
+
+        public virtual List<T> GetData()
+        {
+            return _pageData;
         }
     }
 }

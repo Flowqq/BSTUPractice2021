@@ -13,12 +13,14 @@ namespace Program.DataPage
         public int PageSize { get; }
 
         public Paginator(int pageSize)
+        
         {
             DataPages = new List<T>();
             CurrentPageNumber = 0;
             PageSize = pageSize;
             TotalPages = 0;
         }
+
         protected T GetCurrentPageData()
         {
             return DataPages[CurrentPageNumber];
