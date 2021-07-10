@@ -8,7 +8,7 @@ namespace Program
     {
         public string Id { get; }
         public string Name { get; }
-        public SortedSet<DataUnit> DataUnits { get; }
+        public List<DataUnit> DataUnits { get; }
 
         public CollectionDefinition Definition
         {
@@ -23,12 +23,19 @@ namespace Program
         {
             Id = id;
             Name = name;
-            DataUnits = new SortedSet<DataUnit>();
+            DataUnits = new List<DataUnit>();
         }
 
-        public bool AddDataUnit(DataUnit dataUnit)
+        public Collection(string id, string name, List<DataUnit> dataUnits)
         {
-            return DataUnits.Add(dataUnit);
+            Id = id;
+            Name = name;
+            DataUnits = dataUnits;
+        }
+
+        public void AddDataUnit(DataUnit dataUnit)
+        {
+             DataUnits.Add(dataUnit);
         }
 
         public void RemoveDataUnit(string dataUnitId)
@@ -51,9 +58,9 @@ namespace Program
             return false;
         }
 
-        public SortedSet<DataUnit> SearchDataUnits(SortedSet<DataUnitProp> searchProps)
+        public List<DataUnit> SearchDataUnits(List<DataUnitProp> searchProps)
         {
-            var resultSet = new SortedSet<DataUnit>();
+            var resultSet = new List<DataUnit>();
             foreach (var dataUnit in DataUnits)
             {
                 var matches = searchProps.All(searchField => dataUnit.GetProperty(searchField.Name).Value.Equals(searchField.Value));
