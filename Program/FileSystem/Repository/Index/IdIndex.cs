@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Program.Utils;
 
 namespace Program
 {
@@ -86,7 +87,7 @@ namespace Program
         {
             if (IsLeaf)
             {
-                return FileSystemConfig.GetCollectionDataFilepathByIndex(this);
+                return PathUtils.GetCollectionDataFilepathByIndex(this);
             }
             throw new Exception("Can't get index filepath - index isn't leaf!");
         }

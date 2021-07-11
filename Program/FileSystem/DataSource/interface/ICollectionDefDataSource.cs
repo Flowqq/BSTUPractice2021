@@ -2,7 +2,7 @@
 
 namespace Program.userInterface
 {
-    public interface ICollectionDefFileInterface
+    public interface ICollectionDefDataSource
     {
         List<CollectionDefinition> LoadCollectionDefinitions();
         void SaveCollectionDefinition(CollectionDefinition collectionDefinition);

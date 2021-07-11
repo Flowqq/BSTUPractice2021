@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Program.Utils;
 
 namespace Program.userInterface
 {
-    public class CollectionDefinitionFileRepo : ICollectionDefFileInterface
+    public class CollectionDefinitionDataSource : ICollectionDefDataSource
     {
         public List<CollectionDefinition> LoadCollectionDefinitions()
         {
@@ -24,7 +25,8 @@ namespace Program.userInterface
                 }
                 return definitions;
             }
-            throw new Exception($"File with collections definitions by path {filepath} not found!");
+
+            return new List<CollectionDefinition>();
         }
 
         public void SaveCollectionDefinition(CollectionDefinition collectionDefinition)
@@ -63,7 +65,7 @@ namespace Program.userInterface
             var fileExists = File.Exists(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
             if (!fileExists)
             {
-                FileSystemConfig.CreateDirsForFile(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
+                DirUtils.CreateDirsForFile(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
             }
             using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Create))
             {

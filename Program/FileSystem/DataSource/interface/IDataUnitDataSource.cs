@@ -2,7 +2,7 @@
 
 namespace Program.userInterface
 {
-    public interface IDataUnitFileInterface
+    public interface IDataUnitDataSource
     {
         void DivideIndexDataByTwo(string oldIndexFilepath, string newLeftIndexPath, string newRightIndexPath,
             string divideId);

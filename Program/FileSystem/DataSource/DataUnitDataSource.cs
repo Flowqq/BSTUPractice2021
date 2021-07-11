@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Program.userInterface;
+using Program.Utils;
 
 namespace Program
 {
-    public class DataUnitFileRepository : IDataUnitFileInterface
+    public class DataUnitDataSource : IDataUnitDataSource
     {
         public void DivideIndexDataByTwo(string oldIndexFilepath, string newLeftIndexPath, string newRightIndexPath,
             string divideId)
@@ -17,7 +18,7 @@ namespace Program
 
             RewriteDataUnitsToFile(newLeftIndexPath, new List<DataUnit>(loverUnits));
             RewriteDataUnitsToFile(newRightIndexPath, new List<DataUnit>(upperUnits));
-            FileSystemConfig.DeleteFile(oldIndexFilepath);
+            DirUtils.DeleteFile(oldIndexFilepath);
         }
 
         public List<DataUnit> LoadDataUnitsFromFile(string filepath)
@@ -93,7 +94,7 @@ namespace Program
             var fileExists = File.Exists(filepath);
             if (!fileExists)
             {
-                FileSystemConfig.CreateDirsForFile(filepath);
+                DirUtils.CreateDirsForFile(filepath);
             }
             using (var stream = new FileStream(filepath, FileMode.Create))
             {

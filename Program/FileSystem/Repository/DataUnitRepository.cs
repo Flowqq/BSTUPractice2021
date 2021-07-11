@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
+using Program.Controller.interfaces;
 using Program.DataPage;
 using Program.userInterface;
 
 namespace Program.Controller
 {
-    public class DataUnitRepository
+    public class DataUnitRepository : IDataUnitRepo
     {
-        public IDataUnitFileInterface DataUnitFileInterface { get; }
+        public IDataUnitDataSource DataUnitDataSource { get; }
         public IndexRepository IndexRepository { get; }
 
-        public DataUnitRepository(IDataUnitFileInterface dataUnitFileInterface, IndexRepository indexRepository)
+        public DataUnitRepository(IDataUnitDataSource dataUnitDataSource, IndexRepository indexRepository)
         {
-            DataUnitFileInterface = dataUnitFileInterface;
+            DataUnitDataSource = dataUnitDataSource;
             IndexRepository = indexRepository;
         }
 
@@ -24,7 +25,7 @@ namespace Program.Controller
         public DataUnit GetDataUnitById(string collectionId, string dataUnitId)
         {
             var filePath = IndexRepository.GetDataUnitIndexFilepath(collectionId, dataUnitId);
-            var indexDataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filePath);
+            var indexDataUnits = DataUnitDataSource.LoadDataUnitsFromFile(filePath);
             return indexDataUnits.Find(unit => unit.Id == dataUnitId);
         }
 
@@ -38,14 +39,14 @@ namespace Program.Controller
         public void SaveDataUnit(string collectionId, DataUnit dataUnit)
         {
             var filepath = IndexRepository.GetDataUnitIndexFilepath(collectionId, dataUnit.Id);
-            DataUnitFileInterface.SaveDataUnit(filepath, dataUnit);
+            DataUnitDataSource.SaveDataUnit(filepath, dataUnit);
             IndexRepository.AddDataUnit(collectionId, dataUnit.Id);
         }
 
         public void DeleteDataUnit(string collectionId, string dataUnitId)
         {
             var filepath = IndexRepository.GetDataUnitIndexFilepath(collectionId, dataUnitId);
-            DataUnitFileInterface.DeleteDataUnit(filepath, dataUnitId);
+            DataUnitDataSource.DeleteDataUnit(filepath, dataUnitId);
             IndexRepository.RemoveDataUnit(collectionId, dataUnitId);
         }
 
@@ -55,7 +56,7 @@ namespace Program.Controller
             var filePaths = IndexRepository.GetAllIndexesDataFilePaths(collectionId);
             foreach (var filePath in filePaths)
             {
-                var indexDataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filePath);
+                var indexDataUnits = DataUnitDataSource.LoadDataUnitsFromFile(filePath);
                 dataUnits.AddRange(indexDataUnits);
             }
 

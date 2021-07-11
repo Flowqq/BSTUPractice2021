@@ -1,33 +1,43 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Program.Controller.interfaces;
 using Program.userInterface;
+using Program.Utils;
 
 namespace Program.Controller
 {
-    public class CollectionDefinitionRepository
+    public class CollectionDefinitionRepository : ICollectionDefinitionRepo
     {
-        public ICollectionDefFileInterface CollectionDefFileInterface { get; }
+        public ICollectionDefDataSource CollectionDefDataSource { get; }
         public IndexRepository IndexRepository { get; }
 
-        public CollectionDefinitionRepository(ICollectionDefFileInterface collectionDefFileInterface, IndexRepository indexRepository)
+        public CollectionDefinitionRepository(ICollectionDefDataSource collectionDefDataSource, IndexRepository indexRepository)
         {
-            CollectionDefFileInterface = collectionDefFileInterface;
+            CollectionDefDataSource = collectionDefDataSource;
             IndexRepository = indexRepository;
         }
 
         public List<CollectionDefinition> LoadCollectionDefinitions()
         {
-            return CollectionDefFileInterface.LoadCollectionDefinitions();
+            return CollectionDefDataSource.LoadCollectionDefinitions();
         }
 
         public void SaveCollection(CollectionDefinition collectionDefinition)
         {
-            CollectionDefFileInterface.SaveCollectionDefinition(collectionDefinition);
+            CollectionDefDataSource.SaveCollectionDefinition(collectionDefinition);
             IndexRepository.CreateIndex(collectionDefinition);
+        }
+        public void CreateCollection(CollectionDefinition collectionDefinition)
+        {
+            CollectionDefDataSource.SaveCollectionDefinition(collectionDefinition);
+            IndexRepository.CreateIndex(collectionDefinition);
+            var firstDataFilePath = IndexRepository.GetAllIndexesDataFilePaths(collectionDefinition.Id).FirstOrDefault();
+            DirUtils.CreateFile(firstDataFilePath);
         }
 
         public void DeleteCollection(string collectionId)
         {
-            CollectionDefFileInterface.DeleteCollection(collectionId);
+            CollectionDefDataSource.DeleteCollection(collectionId);
             IndexRepository.RemoveIndex(collectionId);
         }
     }

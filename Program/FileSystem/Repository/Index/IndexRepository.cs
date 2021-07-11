@@ -8,16 +8,16 @@ namespace Program
 {
     public class IndexRepository
     {
-        public IDataUnitFileInterface DataUnitFileInterface { get; }
-        public IIndexFileInterface IndexFileInterface { get; }
-        public List<IdIndex> AllIndexes { get; }
+        protected IDataUnitDataSource DataUnitDataSource { get; }
+        protected  IDataUnitIndexDataSource DataUnitIndexDataSource { get; }
+        protected List<IdIndex> AllIndexes { get; }
 
-        public IndexRepository(List<CollectionDefinition> colDefs, IDataUnitFileInterface dataUnitFileInterface,
-            IIndexFileInterface indexFileInterface)
+        public IndexRepository(List<CollectionDefinition> colDefs, IDataUnitDataSource dataUnitDataSource,
+            IDataUnitIndexDataSource dataUnitIndexDataSource)
         {
-            DataUnitFileInterface = dataUnitFileInterface;
-            IndexFileInterface = indexFileInterface;
-            AllIndexes = IndexFileInterface.LoadIndexes(colDefs);
+            DataUnitDataSource = dataUnitDataSource;
+            DataUnitIndexDataSource = dataUnitIndexDataSource;
+            AllIndexes = DataUnitIndexDataSource.LoadIndexes(colDefs);
         }
 
         public void CreateIndex(CollectionDefinition collectionDefinition)
@@ -25,8 +25,8 @@ namespace Program
             if (AllIndexes.Find(index => index.ColDef.Id == collectionDefinition.Id) == null)
             {
                 var newIndex = new IdIndex(collectionDefinition);
-                IndexFileInterface.CreateIndex(collectionDefinition);
-                IndexFileInterface.SaveIndexToFile(newIndex);
+                DataUnitIndexDataSource.CreateIndex(collectionDefinition);
+                DataUnitIndexDataSource.SaveIndexToFile(newIndex);
                 AllIndexes.Add(newIndex);
             }
         }
@@ -47,7 +47,7 @@ namespace Program
                     DivideByTwo(index);
                 }
                 var filepath = index.FindIndexFilepathByUnitId(dataUnitId);
-                IndexFileInterface.SaveIndexToFile(index);
+                DataUnitIndexDataSource.SaveIndexToFile(index);
                 return filepath;
             }
 
@@ -60,7 +60,7 @@ namespace Program
             if (index != null)
             {
                 var filepath = index.RemoveDataUnitIndex(dataUnitId).GetFilepath();
-                IndexFileInterface.SaveIndexToFile(index);
+                DataUnitIndexDataSource.SaveIndexToFile(index);
                 return filepath;
             }
 
@@ -98,8 +98,8 @@ namespace Program
             var rightFilepath = indexToDivide.Right.GetFilepath();
             try
             {
-                DataUnitFileInterface.DivideIndexDataByTwo(dataFilepath, leftFilepath, rightFilepath, midId);
-                IndexFileInterface.SaveIndexToFile(indexToDivide);
+                DataUnitDataSource.DivideIndexDataByTwo(dataFilepath, leftFilepath, rightFilepath, midId);
+                DataUnitIndexDataSource.SaveIndexToFile(indexToDivide);
             }
             catch (Exception e)
             {

@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using Program.userInterface;
+using Program.Utils;
 
 namespace Program
 {
-    public class IndexFileInterface : IIndexFileInterface
+    public class DataUnitIndexDataSource : IDataUnitIndexDataSource
     {
         public void SaveIndexToFile(IdIndex index)
         {
-            var indexFilepath = FileSystemConfig.GetCollectionIndexFilepath(index.ColDef);
-            var dirFilepath = FileSystemConfig.GetDirPathFomFilePath(indexFilepath);
+            var indexFilepath = PathUtils.GetCollectionIndexFilepath(index.ColDef);
+            var dirFilepath = DirUtils.GetDirPathFomFilePath(indexFilepath);
             if (!File.Exists(indexFilepath))
             {
                 Directory.CreateDirectory(dirFilepath);
@@ -27,7 +28,7 @@ namespace Program
             var collectionsIndexes = new List<IdIndex>();
             foreach (var colDef in colDefs)
             {
-                var indexFilepath = FileSystemConfig.GetCollectionIndexFilepath(colDef);
+                var indexFilepath = PathUtils.GetCollectionIndexFilepath(colDef);
                 var fileExists = File.Exists(indexFilepath);
                 if (fileExists)
                 {
@@ -47,7 +48,7 @@ namespace Program
 
         public void CreateIndex(CollectionDefinition collectionDefinition)
         {
-            var dirFilepath = FileSystemConfig.GetCollectionIndexFilepath(collectionDefinition);
+            var dirFilepath = PathUtils.GetCollectionIndexFilepath(collectionDefinition);
             if (Directory.Exists(dirFilepath))
             {
                 Directory.CreateDirectory(dirFilepath);
