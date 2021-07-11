@@ -25,11 +25,6 @@ namespace Program
             InitializeComponent();
         }
 
-        private void CollectionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
         private void CreateCollectionButton_Click(object sender, RoutedEventArgs e)
         {
             TextBox tb = new TextBox
@@ -45,21 +40,40 @@ namespace Program
             CollectionsList.Items.Add(tb);
         }
 
+        
+
         private void TextBoxClosing(object sender, RoutedEventArgs e)
         {
             TextBox tb = sender as TextBox;
             int index = CollectionsList.Items.IndexOf(tb);
             string collectionName = tb.Text;
             CollectionsList.Items.Remove(tb);
-            CollectionsList.Items.Insert(index, new TextBlock
+
+            TextBlock textBlock = new TextBlock
             {
                 Text = collectionName,
                 FontSize = 17,
                 Height = 32,
                 Width = 560,
                 Padding = new Thickness(10, 0, 0, 0)
-            });
+            };
+            textBlock.MouseLeftButtonDown += new MouseButtonEventHandler(OpenCollection);
+
+
+
+            CollectionsList.Items.Insert(index, textBlock);
         }
+
+        private void OpenCollection(object sender, RoutedEventArgs e)
+        {
+            if (CollectionsList.SelectedItem == sender)
+            {
+                CollectionWindow collectionWindow = new CollectionWindow();
+                collectionWindow.Show();
+            }
+            
+        }
+
 
         private void DeleteCollection(object sender, RoutedEventArgs e)
         {
@@ -71,9 +85,11 @@ namespace Program
             if (CollectionsList.SelectedItem.GetType().Name == "TextBlock") //скорее всего можно сделать умнее
             {
                 int index = CollectionsList.Items.IndexOf(CollectionsList.SelectedItem);
+                string collectionName = (CollectionsList.SelectedItem as TextBlock).Text;
                 CollectionsList.Items.Remove(CollectionsList.SelectedItem);
                 TextBox tb = new TextBox
                 {
+                    Text = collectionName,
                     FontSize = 17,
                     Height = 32,
                     Width = 242,

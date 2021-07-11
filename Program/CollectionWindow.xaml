@@ -1,0 +1,61 @@
+﻿<Window x:Class="Program.CollectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Program"
+        mc:Ignorable="d"
+        Title="CollectionWindow" Height="700" Width="600">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="32,26,0,0" Text="Collection 1" TextWrapping="Wrap" VerticalAlignment="Top" Height="40" Width="116" FontSize="20" FontWeight="DemiBold"/>
+        <Separator HorizontalAlignment="Center" Margin="0,56,0,613" RenderTransformOrigin="0.5,0.5" Width="600">
+            <Separator.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Separator.RenderTransform>
+        </Separator>
+        <TabControl Margin="10,71,10,87">
+            <TabItem Header="Record 1">
+                <Grid Background="#FFE5E5E5" Height="505">
+                    <ListBox>
+                        <StackPanel Height="70" Width="463" Orientation="Horizontal">
+                            <TextBlock Text="id" TextWrapping="Wrap" Width="163"/>
+                            <TextBlock Text="id548486512" TextWrapping="Wrap" Width="167"/>
+                        </StackPanel>
+                        <StackPanel Height="70" Width="475" Orientation="Horizontal">
+                            <TextBlock Text="name" TextWrapping="Wrap" Width="163"/>
+                            <TextBlock Text="My name" TextWrapping="Wrap" Width="167"/>
+                        </StackPanel>
+                        <StackPanel Height="70" Width="463" Orientation="Horizontal">
+                            <TextBlock Text="num" TextWrapping="Wrap" Width="163"/>
+                            <TextBlock Text="500" TextWrapping="Wrap" Width="167"/>
+                        </StackPanel>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Record 2">
+                <Grid Background="#FFE5E5E5">
+                    <ListBox>
+                        <StackPanel Height="70" Width="464" Orientation="Horizontal">
+                            <TextBlock Text="id" TextWrapping="Wrap" Width="163"/>
+                            <TextBlock Text="id9651145665" TextWrapping="Wrap" Width="167"/>
+                        </StackPanel>
+                        <StackPanel Height="70" Width="499" Orientation="Horizontal">
+                            <TextBlock Text="name" TextWrapping="Wrap" Width="163"/>
+                            <TextBlock Text="what name?" TextWrapping="Wrap" Width="167"/>
+                        </StackPanel>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Content="Create Record" HorizontalAlignment="Left" Margin="427,26,0,0" VerticalAlignment="Top" Height="30" Width="123"/>
+        <Button Content="Edit Field" HorizontalAlignment="Left" Margin="300,621,0,0" VerticalAlignment="Top" Height="30" Width="122"/>
+        <Button Content="Add Field" HorizontalAlignment="Left" Margin="450,621,0,0" VerticalAlignment="Top" Height="30" Width="122"/>
+        <Button Content="Delete Record" HorizontalAlignment="Left" Margin="290,26,0,0" VerticalAlignment="Top" Height="30" Width="122"/>
+
+    </Grid>
+</Window>
