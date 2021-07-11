@@ -4,34 +4,15 @@ using Program.userInterface;
 
 namespace Program.Controller
 {
-    public class FileSystemController
+    public class DataUnitRepository
     {
-        public ICollectionDefFileInterface CollectionDefFileInterface { get; }
         public IDataUnitFileInterface DataUnitFileInterface { get; }
-        public IndexController IndexController { get; }
+        public IndexRepository IndexRepository { get; }
 
-        public FileSystemController(ICollectionDefFileInterface collectionDefFileInterface,
-            IDataUnitFileInterface dataUnitFileInterface, IndexController indexController)
+        public DataUnitRepository(IDataUnitFileInterface dataUnitFileInterface, IndexRepository indexRepository)
         {
-            CollectionDefFileInterface = collectionDefFileInterface;
             DataUnitFileInterface = dataUnitFileInterface;
-            IndexController = indexController;
-        }
-
-        public List<CollectionDefinition> LoadCollectionDefinitions()
-        {
-            return CollectionDefFileInterface.LoadCollectionDefinitions();
-        }
-
-        public void SaveCollection(CollectionDefinition collectionDefinition)
-        {
-            CollectionDefFileInterface.SaveCollectionDefinition(collectionDefinition);
-            IndexController.CreateIndex(collectionDefinition);
-        }
-
-        public void DeleteCollection(string collectionId)
-        {
-            CollectionDefFileInterface.DeleteCollection(collectionId);
+            IndexRepository = indexRepository;
         }
 
         public DataUnitsPaginator LoadCollectionData(string collectionId, int pageSize = 10)
@@ -42,7 +23,7 @@ namespace Program.Controller
 
         public DataUnit GetDataUnitById(string collectionId, string dataUnitId)
         {
-            var filePath = IndexController.GetDataUnitIndexFilepath(collectionId, dataUnitId);
+            var filePath = IndexRepository.GetDataUnitIndexFilepath(collectionId, dataUnitId);
             var indexDataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filePath);
             return indexDataUnits.Find(unit => unit.Id == dataUnitId);
         }
@@ -56,22 +37,22 @@ namespace Program.Controller
 
         public void SaveDataUnit(string collectionId, DataUnit dataUnit)
         {
-            var filepath = IndexController.GetDataUnitIndexFilepath(collectionId, dataUnit.Id);
+            var filepath = IndexRepository.GetDataUnitIndexFilepath(collectionId, dataUnit.Id);
             DataUnitFileInterface.SaveDataUnit(filepath, dataUnit);
-            IndexController.AddDataUnit(collectionId, dataUnit.Id);
+            IndexRepository.AddDataUnit(collectionId, dataUnit.Id);
         }
 
         public void DeleteDataUnit(string collectionId, string dataUnitId)
         {
-            var filepath = IndexController.GetDataUnitIndexFilepath(collectionId, dataUnitId);
+            var filepath = IndexRepository.GetDataUnitIndexFilepath(collectionId, dataUnitId);
             DataUnitFileInterface.DeleteDataUnit(filepath, dataUnitId);
-            IndexController.RemoveDataUnit(collectionId, dataUnitId);
+            IndexRepository.RemoveDataUnit(collectionId, dataUnitId);
         }
 
         protected List<DataUnit> GetAllCollectionDataUnits(string collectionId)
         {
             var dataUnits = new List<DataUnit>();
-            var filePaths = IndexController.GetAllIndexesDataFilePaths(collectionId);
+            var filePaths = IndexRepository.GetAllIndexesDataFilePaths(collectionId);
             foreach (var filePath in filePaths)
             {
                 var indexDataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filePath);

@@ -6,13 +6,13 @@ using Program.userInterface;
 
 namespace Program
 {
-    public class IndexController
+    public class IndexRepository
     {
         public IDataUnitFileInterface DataUnitFileInterface { get; }
         public IIndexFileInterface IndexFileInterface { get; }
         public List<IdIndex> AllIndexes { get; }
 
-        public IndexController(List<CollectionDefinition> colDefs, IDataUnitFileInterface dataUnitFileInterface,
+        public IndexRepository(List<CollectionDefinition> colDefs, IDataUnitFileInterface dataUnitFileInterface,
             IIndexFileInterface indexFileInterface)
         {
             DataUnitFileInterface = dataUnitFileInterface;
@@ -46,7 +46,6 @@ namespace Program
                 {
                     DivideByTwo(index);
                 }
-
                 var filepath = index.FindIndexFilepathByUnitId(dataUnitId);
                 IndexFileInterface.SaveIndexToFile(index);
                 return filepath;
@@ -86,7 +85,6 @@ namespace Program
             {
                 return indexter.FindIndexFilepathByUnitId(dataUnitId);
             }
-
             return null;
         }
 
