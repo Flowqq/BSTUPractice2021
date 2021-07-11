@@ -77,6 +77,10 @@ namespace Program
                 var bytes = new List<byte>();
                 bytes.AddRange(dataUnit.Serialize());
                 var unitsCount = SerializeUtils.ReadNextInt(fileStream);
+                if (unitsCount == -1)
+                {
+                    unitsCount = 0;
+                }
                 unitsCount++;
                 fileStream.Seek(0, SeekOrigin.Begin);
                 fileStream.WriteByte(SerializeUtils.IntToByte(unitsCount));

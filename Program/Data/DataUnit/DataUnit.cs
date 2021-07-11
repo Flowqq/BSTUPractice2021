@@ -7,15 +7,15 @@ namespace Program
 {
     public class DataUnit : IComparable
     {
-        public string Id { get; }
-        public SortedSet<DataUnitProp> Props { get; }
+        public string Id { get; set; }
+        public List<DataUnitProp> Props { get; }
 
         public DataUnit(string id)
         {
             Id = id;
-            Props = new SortedSet<DataUnitProp>();
+            Props = new List<DataUnitProp>();
         }
-        public DataUnit(string id, SortedSet<DataUnitProp> props)
+        public DataUnit(string id, List<DataUnitProp> props)
         {
             Id = id;
             Props = props;
@@ -40,9 +40,9 @@ namespace Program
             return Props.FirstOrDefault(prop => prop.Name == name);
         }
 
-        public bool AddProperty(DataUnitProp dataUnitProp)
+        public void AddProperty(DataUnitProp dataUnitProp)
         {
-            return Props.Add(dataUnitProp);
+            Props.Add(dataUnitProp);
         }
         public void AddProperties(HashSet<DataUnitProp> dataUnitProps)
         {
@@ -52,24 +52,18 @@ namespace Program
             }
         }
 
-        public bool UpdateProperty(DataUnitProp dataUnitProp)
+        public void UpdateProperty(DataUnitProp dataUnitProp)
         {
-            return SetProperty(dataUnitProp.Name, dataUnitProp);
+            SetProperty(dataUnitProp.Name, dataUnitProp);
         }
-        protected bool SetProperty(string name, DataUnitProp dataUnitProp)
+        protected void SetProperty(string name, DataUnitProp dataUnitProp)
         {
             var propToUpdate = GetProperty(name);
             if (propToUpdate != null)
             {
                 var removed = Props.Remove(propToUpdate);
-                var added = Props.Add(dataUnitProp);
-                if (!added)
-                {
-                    Props.Add(propToUpdate);
-                }
-                return removed && added;
+                Props.Add(dataUnitProp);
             }
-            return false;
         }
 
         public List<byte> Serialize()
@@ -89,7 +83,7 @@ namespace Program
         {
             var id = SerializeUtils.ReadNextString(fileStream);
             var propsCount = SerializeUtils.ReadNextInt(fileStream);
-            var props = new SortedSet<DataUnitProp>();
+            var props = new List<DataUnitProp>();
             for (var i = 0; i < propsCount; i++)
             {
                 var prop = DataUnitPropFactory.DeserializeDataUnit(fileStream);

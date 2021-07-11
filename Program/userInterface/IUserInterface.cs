@@ -6,11 +6,12 @@ namespace Program.userInterface
     public interface IUserInterface
     {
         List<CollectionDefinition> GetCollectionDefinitions();
-        Collection CreateCollection(string collectionName);
+
+        CollectionDefinition CreateCollection(string collectionName);
         DataUnitsPaginator GetCollectionData(string collectionId, int pageSize = 10);
-        DataUnit AddDataUnit(string collectionId, DataUnit dataUnit);
-        DataUnit UpdateDataUnit(string collectionId, string dataUnitId, SortedSet<DataUnitProp> updatedProps);
-        bool DeleteDataUnit(string collectionId, string dataUnitId);
-        DataUnitsPaginator SearchDataUnits(string collectionId, SortedSet<DataUnitProp> searchFields, int pageSize = 10);
+        DataUnit AddDataUnit(string collectionId, List<DataUnitProp> props);
+        DataUnit UpdateDataUnit(string collectionId, DataUnit dataUnit);
+        void DeleteDataUnit(string collectionId, string dataUnitId);
+        DataUnitsPaginator SearchDataUnits(string collectionId, List<DataUnitProp> searchFields, int pageSize = 10);
     }
 }
