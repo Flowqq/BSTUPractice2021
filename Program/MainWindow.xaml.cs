@@ -48,10 +48,43 @@ namespace Program
         private void TextBoxClosing(object sender, RoutedEventArgs e)
         {
             TextBox tb = sender as TextBox;
+            int index = CollectionsList.Items.IndexOf(tb);
             string collectionName = tb.Text;
             CollectionsList.Items.Remove(tb);
-            CollectionsList.Items.Add(new TextBlock { Text = collectionName, FontSize = 17, Height = 32,
-                Width = 560, Padding = new Thickness(10, 0, 0, 0) });
+            CollectionsList.Items.Insert(index, new TextBlock
+            {
+                Text = collectionName,
+                FontSize = 17,
+                Height = 32,
+                Width = 560,
+                Padding = new Thickness(10, 0, 0, 0)
+            });
+        }
+
+        private void DeleteCollection(object sender, RoutedEventArgs e)
+        {
+            CollectionsList.Items.Remove(CollectionsList.SelectedItem);
+        }
+
+        private void RenameCollection(object sender, RoutedEventArgs e)
+        {
+            if (CollectionsList.SelectedItem.GetType().Name == "TextBlock") //скорее всего можно сделать умнее
+            {
+                int index = CollectionsList.Items.IndexOf(CollectionsList.SelectedItem);
+                CollectionsList.Items.Remove(CollectionsList.SelectedItem);
+                TextBox tb = new TextBox
+                {
+                    FontSize = 17,
+                    Height = 32,
+                    Width = 242,
+                    Padding = new Thickness(5, 0, 0, 0)
+                };
+                tb.LostFocus += new RoutedEventHandler(TextBoxClosing);
+
+                CollectionsList.Items.Insert(index, tb);
+            }
+
+
         }
     }
 }
