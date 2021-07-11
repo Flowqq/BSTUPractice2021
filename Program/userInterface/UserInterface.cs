@@ -27,6 +27,11 @@ namespace Program.userInterface
             return colDef;
         }
 
+        public void DeleteCollection(string collectionId)
+        {
+            MainRepo.CollectionDefinitionRepository.DeleteCollection(collectionId);
+        }
+
         public DataUnitsPaginator GetCollectionData(string collectionId, int pageSize = 10)
         {
             return MainRepo.DataUnitRepository.LoadCollectionData(collectionId, pageSize);

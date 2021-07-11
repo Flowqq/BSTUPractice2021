@@ -9,6 +9,7 @@ namespace Program.userInterface
 
         CollectionDefinition CreateCollection(string collectionName);
         CollectionDefinition RenameCollection(string collectionId, string newName);
+        void DeleteCollection(string collectionId);
         DataUnitsPaginator GetCollectionData(string collectionId, int pageSize = 10);
         DataUnit AddDataUnit(string collectionId, List<DataUnitProp> props);
         DataUnit UpdateDataUnit(string collectionId, DataUnit dataUnit);
