@@ -20,6 +20,13 @@ namespace Program.userInterface
             return colDef;
         }
 
+        public CollectionDefinition RenameCollection(string collectionId, string newName)
+        {
+            var colDef = new CollectionDefinition(collectionId, newName, 0);
+            MainRepo.CollectionDefinitionRepository.SaveCollection(colDef);
+            return colDef;
+        }
+
         public DataUnitsPaginator GetCollectionData(string collectionId, int pageSize = 10)
         {
             return MainRepo.DataUnitRepository.LoadCollectionData(collectionId, pageSize);

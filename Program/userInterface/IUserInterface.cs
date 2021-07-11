@@ -8,6 +8,7 @@ namespace Program.userInterface
         List<CollectionDefinition> GetCollectionDefinitions();
 
         CollectionDefinition CreateCollection(string collectionName);
+        CollectionDefinition RenameCollection(string collectionId, string newName);
         DataUnitsPaginator GetCollectionData(string collectionId, int pageSize = 10);
         DataUnit AddDataUnit(string collectionId, List<DataUnitProp> props);
         DataUnit UpdateDataUnit(string collectionId, DataUnit dataUnit);
