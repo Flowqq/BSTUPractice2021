@@ -8,19 +8,19 @@
     "net5.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Ilia\\.nuget\\packages\\": {}
+    "C:\\Users\\ZHIZDRA\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Files\\GIT\\BSTUPractice2021\\Program\\Program.csproj",
+      "projectUniqueName": "D:\\Files\\GitProjects\\GitGitGit\\BSTUPractice2021\\Program\\Program.csproj",
       "projectName": "Program",
-      "projectPath": "D:\\Files\\GIT\\BSTUPractice2021\\Program\\Program.csproj",
-      "packagesPath": "C:\\Users\\Ilia\\.nuget\\packages\\",
-      "outputPath": "D:\\Files\\GIT\\BSTUPractice2021\\Program\\obj\\",
+      "projectPath": "D:\\Files\\GitProjects\\GitGitGit\\BSTUPractice2021\\Program\\Program.csproj",
+      "packagesPath": "C:\\Users\\ZHIZDRA\\.nuget\\packages\\",
+      "outputPath": "D:\\Files\\GitProjects\\GitGitGit\\BSTUPractice2021\\Program\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Ilia\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ZHIZDRA\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -63,7 +63,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.104\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

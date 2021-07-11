@@ -23,5 +23,32 @@ namespace Program
         {
             InitializeComponent();
         }
+
+
+        private void CreateRecordClick(object sender, RoutedEventArgs e)
+        {
+            ListBox fieldsList = new ListBox();
+
+            TabItem tabItem = new TabItem{ Content = fieldsList, Header = "Record 3" };
+            records.Items.Add(tabItem);
+        }
+
+        private void DeleteRecordClick(object sender, RoutedEventArgs e)
+        {
+            records.Items.Remove(records.SelectedItem);
+        }
+
+        private void AddFieldClick(object sender, RoutedEventArgs e)
+        {
+            TabItem selectedTabItem = records.SelectedItem as TabItem;
+            ListBox listBox = selectedTabItem.Content as ListBox;
+            StackPanel stackPanel = new StackPanel { Height = 70, Width = 463, Orientation = Orientation.Horizontal };
+            stackPanel.Children.Add(new TextBlock { Text = "color", Width = 163 });
+            stackPanel.Children.Add(new TextBlock { Text = "blue", Width = 163 });
+
+            listBox.Items.Add(stackPanel);
+
+        }
     }
 }
+    
