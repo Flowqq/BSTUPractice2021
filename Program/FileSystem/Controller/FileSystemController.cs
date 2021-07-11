@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Program.DataPage;
 using Program.userInterface;
 
@@ -25,20 +23,15 @@ namespace Program.Controller
             return CollectionDefFileInterface.LoadCollectionDefinitions();
         }
 
-        public void SaveNewCollection(CollectionDefinition collectionDefinition)
+        public void SaveCollection(CollectionDefinition collectionDefinition)
         {
-            var newColId = collectionDefinition.Id;
-            var newColName = collectionDefinition.Name;
-            var definitions = LoadCollectionDefinitions();
-            if (definitions.Find(def => def.Id == newColId || def.Name == newColName) == null)
-            {
-                CollectionDefFileInterface.SaveCollectionDefinition(collectionDefinition);
-                IndexController.CreateIndex(collectionDefinition);
-            }
-            else
-            {
-                throw new Exception($"Collection with name {newColName} and id {newColId} already exists!");
-            }
+            CollectionDefFileInterface.SaveCollectionDefinition(collectionDefinition);
+            IndexController.CreateIndex(collectionDefinition);
+        }
+
+        public void DeleteCollection(string collectionId)
+        {
+            CollectionDefFileInterface.DeleteCollection(collectionId);
         }
 
         public DataUnitsPaginator LoadCollectionData(string collectionId, int pageSize = 10)
@@ -53,52 +46,26 @@ namespace Program.Controller
             var indexDataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filePath);
             return indexDataUnits.Find(unit => unit.Id == dataUnitId);
         }
-        
+
         public List<DataUnit> GetDataUnitsByProps(string collectionId, List<DataUnitProp> props)
         {
             var dataUnits = GetAllCollectionDataUnits(collectionId);
             var collection = new Collection("", "", dataUnits);
             return collection.SearchDataUnits(props);
         }
-        public void SaveDataUnitsToFile(string collectionId, List<DataUnit> dataUnits)
-        {
-            foreach (var dataUnit in dataUnits)
-            {
-                var indexFilepath = IndexController.AddDataUnit(collectionId, dataUnit.Id);
-                DataUnitFileInterface.SaveDataUnit(indexFilepath, dataUnit);
-            }
-        }
 
         public void SaveDataUnit(string collectionId, DataUnit dataUnit)
         {
-            SaveDataUnitsToFile(collectionId, new List<DataUnit>() {dataUnit});
-        }
-
-        public void UpdateDataUnit(string collectionId, DataUnit dataUnit)
-        {
             var filepath = IndexController.GetDataUnitIndexFilepath(collectionId, dataUnit.Id);
-            var dataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filepath);
-            var dataUnitToReplace = dataUnits.FirstOrDefault(unit => unit.Id == dataUnit.Id);
-            if (dataUnitToReplace != null)
-            {
-                dataUnits.Remove(dataUnitToReplace);
-            }
-            dataUnits.Add(dataUnit);
-            DataUnitFileInterface.DeleteFile(filepath);
-            SaveDataUnitsToFile(filepath, dataUnits);
+            DataUnitFileInterface.SaveDataUnit(filepath, dataUnit);
+            IndexController.AddDataUnit(collectionId, dataUnit.Id);
         }
 
         public void DeleteDataUnit(string collectionId, string dataUnitId)
         {
             var filepath = IndexController.GetDataUnitIndexFilepath(collectionId, dataUnitId);
-            var dataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filepath);
-            var dataUnitToDelete = dataUnits.FirstOrDefault(unit => unit.Id == dataUnitId);
-            if (dataUnitToDelete != null)
-            {
-                dataUnits.Remove(dataUnitToDelete);
-            }
-            DataUnitFileInterface.DeleteFile(filepath);
-            SaveDataUnitsToFile(filepath, dataUnits);
+            DataUnitFileInterface.DeleteDataUnit(filepath, dataUnitId);
+            IndexController.RemoveDataUnit(collectionId, dataUnitId);
         }
 
         protected List<DataUnit> GetAllCollectionDataUnits(string collectionId)
@@ -110,6 +77,7 @@ namespace Program.Controller
                 var indexDataUnits = DataUnitFileInterface.LoadDataUnitsFromFile(filePath);
                 dataUnits.AddRange(indexDataUnits);
             }
+
             return dataUnits;
         }
     }

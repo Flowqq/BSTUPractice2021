@@ -13,8 +13,8 @@ namespace Program
 
         public IdIndex Left { get; protected set; }
         public IdIndex Right { get; protected set; }
-        public List<string> IdList { get; }
-        public string FilePostfix { get; }
+        public HashSet<string> IdList { get; }
+        public string FileName { get; }
         public CollectionDefinition ColDef { get; }
 
         public bool IsLeaf
@@ -22,28 +22,28 @@ namespace Program
             get => Left == null && Right == null;
         }
 
-        public IdIndex(IdIndex left, IdIndex right, string postfix, CollectionDefinition colDef)
+        public IdIndex(IdIndex left, IdIndex right, string name, CollectionDefinition colDef)
         {
             Left = left;
             Right = right;
             MaxId = right.MaxId;
             MinId = left.MinId;
-            FilePostfix = postfix;
+            FileName = name;
             ColDef = colDef;
         }
 
-        public IdIndex(List<string> idList, string minId, string maxId, int maxElements, string filePostfix, CollectionDefinition colDef)
+        public IdIndex(HashSet<string> idList, string minId, string maxId, int maxElements, string fileName, CollectionDefinition colDef)
         {
             MaxId = maxId;
             MinId = minId;
             IdList = idList;
             MaxElements = maxElements;
-            FilePostfix = filePostfix;
+            FileName = fileName;
             ColDef = colDef;
             Left = null;
             Right = null;
         }
-        public IdIndex(CollectionDefinition colDef, int maxElements = 2, string filePostfix = "")
+        public IdIndex(CollectionDefinition colDef, int maxElements = 2)
         {
             var maxChar = Convert.ToChar(121);
             var minChar = Convert.ToChar(48);
@@ -56,9 +56,9 @@ namespace Program
             }
             MaxId = new string(maxId);
             MinId = new string(minId);
-            IdList = new List<string>();
+            IdList = new HashSet<string>();
             MaxElements = maxElements;
-            FilePostfix = filePostfix;
+            FileName = colDef.Name;
             ColDef = colDef;
             Left = null;
             Right = null;
@@ -81,56 +81,62 @@ namespace Program
             }
             throw new Exception("Can't get real min Id - index isn't leaf!");
         }
-        public List<string> GetFilePaths()
+
+        public string GetFilepath()
+        {
+            if (IsLeaf)
+            {
+                return FileSystemConfig.GetCollectionDataFilepathByIndex(this);
+            }
+            throw new Exception("Can't get index filepath - index isn't leaf!");
+        }
+        public List<string> GetAllIndexesFilePaths()
         {
             var filepathsList = new List<string>();
             if (IsLeaf)
             {
-                return new List<string>() {FileSystemConfig.GetCollectionDataFilepathByIndex(this)};
+                return new List<string>() {GetFilepath()};
             }
             else
             {
-                filepathsList.AddRange(Left.GetFilePaths());
-                filepathsList.AddRange(Right.GetFilePaths());
+                filepathsList.AddRange(Left.GetAllIndexesFilePaths());
+                filepathsList.AddRange(Right.GetAllIndexesFilePaths());
             }
             return filepathsList;
         }
-        public string FindDataUnitFilePathById(string dataUnitId)
+        public string FindIndexFilepathByUnitId(string dataUnitId)
         {
             var isInRange = IsInRange(dataUnitId);
             if (isInRange && IsLeaf)
             {
-                return FileSystemConfig.GetCollectionDataFilepathByIndex(this);
+                return GetFilepath();
             }
             else if (isInRange && !IsLeaf)
             {
                 if (Left.IsInRange(dataUnitId))
                 {
-                    return Left.FindDataUnitFilePathById(dataUnitId);
+                    return Left.FindIndexFilepathByUnitId(dataUnitId);
                 }
-                return Right.FindDataUnitFilePathById(dataUnitId);
+                return Right.FindIndexFilepathByUnitId(dataUnitId);
             }
             throw new Exception($"No DataUnit with id {dataUnitId} found in index!");
         }
 
-        public bool ContainsId(string id)
-        {
-            if (!IsLeaf)
-            {
-                return Left.ContainsId(id) || Right.ContainsId(id);
-            }
-            return IdList.Contains(id);
-        }
-
         public bool IsInRange(string id)
         {
-            return String.Compare(id, MaxId, StringComparison.Ordinal) < 0 && String.Compare(id, MinId, StringComparison.Ordinal) >= 0;
+            return String.Compare(id, MaxId, StringComparison.Ordinal) < 0 
+                   && String.Compare(id, MinId, StringComparison.Ordinal) >= 0;
         }
 
-        public void Divide(IdIndex left, IdIndex right)
+        public void Divide(string midId)
         {
-            Left = left;
-            Right = right;
+            var loverIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) < 0);
+            var upperIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) >= 0);
+            var leftFilName = FileName + "L";
+            var rightFileName = FileName + "R";
+            Left = new IdIndex(new HashSet<string>(loverIds), MinId, midId, MaxElements, leftFilName, ColDef);
+            Right = new IdIndex(new HashSet<string>(upperIds), midId, MaxId, MaxElements, rightFileName, ColDef);
+            IdList.Clear();
         }
         public IdIndex AddDataUnitIndex(string dataUnitId)
         {
@@ -178,7 +184,7 @@ namespace Program
         {
             var bytes = new List<byte>();
             bytes.Add(SerializeUtils.IntToByte(MaxElements));
-            bytes.AddRange(SerializeUtils.StringToBytes(FilePostfix));
+            bytes.AddRange(SerializeUtils.StringToBytes(FileName));
             bytes.Add(SerializeUtils.BoolToByte(IsLeaf));
             bytes.AddRange(SerializeUtils.StringToBytes(MinId));
             bytes.AddRange(SerializeUtils.StringToBytes(MaxId));
@@ -214,7 +220,7 @@ namespace Program
             else
             {
                 var idCount = SerializeUtils.ReadNextInt(fileStream);
-                var idList = new List<string>();
+                var idList = new HashSet<string>();
                 for (int i = 0; i < idCount; i++)
                 {
                     idList.Add(SerializeUtils.ReadNextString(fileStream));

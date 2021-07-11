@@ -12,19 +12,28 @@ namespace Program
         public IIndexFileInterface IndexFileInterface { get; }
         public List<IdIndex> AllIndexes { get; }
 
-        public IndexController(List<CollectionDefinition> colDefs, IDataUnitFileInterface dataUnitFileInterface, IIndexFileInterface indexFileInterface)
+        public IndexController(List<CollectionDefinition> colDefs, IDataUnitFileInterface dataUnitFileInterface,
+            IIndexFileInterface indexFileInterface)
         {
             DataUnitFileInterface = dataUnitFileInterface;
             IndexFileInterface = indexFileInterface;
             AllIndexes = IndexFileInterface.LoadIndexes(colDefs);
         }
-        
+
         public void CreateIndex(CollectionDefinition collectionDefinition)
         {
-            var newIndex = new IdIndex(collectionDefinition);
-            IndexFileInterface.CreateIndex(collectionDefinition);
-            IndexFileInterface.SaveIndexToFile(newIndex);
-            AllIndexes.Add(newIndex);
+            if (AllIndexes.Find(index => index.ColDef.Id == collectionDefinition.Id) == null)
+            {
+                var newIndex = new IdIndex(collectionDefinition);
+                IndexFileInterface.CreateIndex(collectionDefinition);
+                IndexFileInterface.SaveIndexToFile(newIndex);
+                AllIndexes.Add(newIndex);
+            }
+        }
+
+        public void RemoveIndex(string collectionId)
+        {
+            AllIndexes.RemoveAll(index => index.ColDef.Id == collectionId);
         }
 
         public string AddDataUnit(string collectionId, string dataUnitId)
@@ -37,7 +46,8 @@ namespace Program
                 {
                     DivideByTwo(index);
                 }
-                var filepath = index.FindDataUnitFilePathById(dataUnitId);
+
+                var filepath = index.FindIndexFilepathByUnitId(dataUnitId);
                 IndexFileInterface.SaveIndexToFile(index);
                 return filepath;
             }
@@ -50,7 +60,7 @@ namespace Program
             var index = AllIndexes.FirstOrDefault(indexer => indexer.ColDef.Id == collectionId);
             if (index != null)
             {
-                var filepath = FileSystemConfig.GetCollectionDataFilepathByIndex(index.RemoveDataUnitIndex(dataUnitId));
+                var filepath = index.RemoveDataUnitIndex(dataUnitId).GetFilepath();
                 IndexFileInterface.SaveIndexToFile(index);
                 return filepath;
             }
@@ -63,7 +73,7 @@ namespace Program
             var index = AllIndexes.FirstOrDefault(indexer => indexer.ColDef.Id == collectionId);
             if (index != null)
             {
-                return index.GetFilePaths();
+                return index.GetAllIndexesFilePaths();
             }
 
             throw new Exception($"No indexer find for collection with id {collectionId}!");
@@ -74,7 +84,7 @@ namespace Program
             var indexter = AllIndexes.FirstOrDefault(indexer => indexer.ColDef.Id == collectionId);
             if (indexter != null)
             {
-                return indexter.FindDataUnitFilePathById(dataUnitId);
+                return indexter.FindIndexFilepathByUnitId(dataUnitId);
             }
 
             return null;
@@ -82,33 +92,22 @@ namespace Program
 
         protected void DivideByTwo(IdIndex indexToDivide)
         {
+            var indexCopy = new IdIndex(new HashSet<string>(indexToDivide.IdList), indexToDivide.MinId, indexToDivide.MaxId, indexToDivide.MaxElements, indexToDivide.FileName, indexToDivide.ColDef);
             var midId = SubIds(indexToDivide.GetMaxRealId(), indexToDivide.GetMinRealId());
-            var dataFilepath = FileSystemConfig.GetCollectionDataFilepathByIndex(indexToDivide);
-            // запихнуть в IdIndex
-            var loverIds = indexToDivide.IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) < 0);
-            var upperIds = indexToDivide.IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) >= 0);
-
-            var leftPostfix = indexToDivide.FilePostfix + "L";
-            var rightPostfix = indexToDivide.FilePostfix + "R";
-            var left = new IdIndex(new List<string>(loverIds), indexToDivide.MinId, midId, indexToDivide.MaxElements,
-                leftPostfix, indexToDivide.ColDef);
-            var right = new IdIndex(new List<string>(upperIds), midId, indexToDivide.MaxId, indexToDivide.MaxElements,
-                rightPostfix, indexToDivide.ColDef);
-            indexToDivide.Divide(left, right);
+            var dataFilepath = indexToDivide.GetFilepath();
+            indexToDivide.Divide(midId);
+            var leftFilepath = indexToDivide.Left.GetFilepath();
+            var rightFilepath = indexToDivide.Right.GetFilepath();
             try
             {
-                var leftFilepath = FileSystemConfig.GetCollectionDataFilepathByIndex(left);
-                var rightFilepath = FileSystemConfig.GetCollectionDataFilepathByIndex(right);
                 DataUnitFileInterface.DivideIndexDataByTwo(dataFilepath, leftFilepath, rightFilepath, midId);
-                indexToDivide.IdList.Clear();
                 IndexFileInterface.SaveIndexToFile(indexToDivide);
             }
             catch (Exception e)
             {
-                indexToDivide.Divide(null, null);
+                indexToDivide = indexCopy;
                 throw;
             }
-
         }
 
         protected string SubIds(string firstId, string secId)
@@ -122,6 +121,7 @@ namespace Program
                 var sByte = Convert.ToInt32(secIdBytes[i]);
                 bytes.Add(SerializeUtils.IntToByte((fByte + sByte) / 2));
             }
+
             return new UTF8Encoding().GetString(bytes.ToArray());
         }
     }

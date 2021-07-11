@@ -8,11 +8,12 @@ namespace Program.userInterface
     {
         public List<CollectionDefinition> LoadCollectionDefinitions()
         {
-            var fileExists = File.Exists(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
+            var filepath = FileSystemConfig.COLLECTION_DEFS_FILEPATH;
+            var fileExists = File.Exists(filepath);
             if (fileExists)
             {
                 var definitions = new List<CollectionDefinition>();
-                using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Open))
+                using (FileStream fileStream = new FileStream(filepath, FileMode.Open))
                 {
                     var defsCount = SerializeUtils.ReadNextInt(fileStream);
                     for (int i = 0; i < defsCount; i++)
@@ -23,56 +24,58 @@ namespace Program.userInterface
                 }
                 return definitions;
             }
-            FileSystemConfig.CreateDirsForFile(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
-            Console.Write("Collection definitions file not found!");
-            return new List<CollectionDefinition>();
+            throw new Exception($"File with collections definitions by path {filepath} not found!");
         }
+
         public void SaveCollectionDefinition(CollectionDefinition collectionDefinition)
         {
-            var bytes = collectionDefinition.Serialize();
-            var fileExists = File.Exists(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
-            if (fileExists)
+            var definitions = LoadCollectionDefinitions();
+            var collectionToSave = definitions.Find(def => def.Id == collectionDefinition.Id);
+            if (collectionToSave == null)
             {
-                using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Open))
-                {
-                    var defsCount = SerializeUtils.ReadNextInt(fileStream);
-                    defsCount++;
-                    fileStream.Seek(0, SeekOrigin.Begin);
-                    fileStream.WriteByte(SerializeUtils.IntToByte(defsCount));
-                    fileStream.Seek(0, SeekOrigin.End);
-                    fileStream.Write(bytes.ToArray(), 0, bytes.Count);
-                }
+                definitions.Add(collectionDefinition);
             }
             else
             {
-                using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Create))
-                {
-                    fileStream.WriteByte(SerializeUtils.IntToByte(1));
-                    fileStream.Write(bytes.ToArray(), 0, bytes.Count);
-                }
+                definitions.Remove(collectionToSave);
+                definitions.Add(collectionDefinition);
             }
-            
+            RewriteCollectionDefinitions(definitions);
         }
 
-        public CollectionDefinition LoadCollectionDefinition(string colId)
+        public void DeleteCollection(string collectionId)
+        {
+            var definitions = LoadCollectionDefinitions();
+            var collectionToDelete = definitions.Find(def => def.Id == collectionId);
+            if (collectionToDelete != null)
+            {
+                definitions.Remove(collectionToDelete);
+                RewriteCollectionDefinitions(definitions);
+            }
+            else
+            {
+                throw new Exception($"Collection to delete with id {collectionId} not found!");
+            }
+        }
+
+        protected void RewriteCollectionDefinitions(List<CollectionDefinition> collectionDefinitions)
         {
             var fileExists = File.Exists(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
-            if (fileExists)
+            if (!fileExists)
             {
-                using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Open))
-                {
-                    var defsCount = SerializeUtils.ReadNextInt(fileStream);
-                    for (int i = 0; i < defsCount; i++)
-                    {
-                        var definition = CollectionDefinition.Deserialize(fileStream);
-                        if(definition.Id == colId)
-                        {
-                            return definition;
-                        }
-                    }
-                }
+                FileSystemConfig.CreateDirsForFile(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
             }
-            throw new Exception($"No collection definition with id {colId} found!");
+            using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Create))
+            {
+                var bytes = new List<byte>();
+                var defsCount = collectionDefinitions.Count;
+                bytes.Add(SerializeUtils.IntToByte(defsCount));
+                foreach (var colDef in collectionDefinitions)
+                {
+                    bytes.AddRange(colDef.Serialize());
+                }
+                fileStream.Write(bytes.ToArray(), 0, bytes.Count);
+            }
         }
     }
 }

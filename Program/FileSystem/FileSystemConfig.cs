@@ -11,12 +11,12 @@ namespace Program
 
         public static string GetCollectionIndexFilepath(CollectionDefinition collectionDefinition)
         {
-            return $"{COLLECTIONS_FILEPATH}{collectionDefinition.Name}/colIndex{FILE_EXTENSION}";
+            return $"{COLLECTIONS_FILEPATH}{collectionDefinition.Id}/colIndex{FILE_EXTENSION}";
         }
 
-        public static string GetCollectionDataFilepath(CollectionDefinition collectionDefinition)
+        public static string GetCollectionDataFilepath(string collectionId)
         {
-            return $"{COLLECTIONS_FILEPATH}{collectionDefinition.Name}/";
+            return $"{COLLECTIONS_FILEPATH}{collectionId}/";
         }
 
         public static string GetCollectionDataFilepathByIndex(IdIndex index)
@@ -24,7 +24,7 @@ namespace Program
             if (index.IsLeaf)
             {
                 var indexColDef = index.ColDef;
-                return $"{GetCollectionDataFilepath(indexColDef)}{indexColDef.Name}{index.FilePostfix}{FILE_EXTENSION}";
+                return $"{GetCollectionDataFilepath(indexColDef.Id)}{index.FileName}Index{FILE_EXTENSION}";
             }
             throw new Exception("This index isn't leaf index tree!");
         }
@@ -42,5 +42,17 @@ namespace Program
                 Directory.CreateDirectory(dirFilepath);
             }
         } 
+        
+        public static void DeleteFile(string filepath)
+        {
+            if (File.Exists(filepath))
+            {
+                File.Delete(filepath);
+            }
+            else
+            {
+                throw new Exception($"File to delete - {filepath} not exists!");
+            }
+        }
     }
 }
