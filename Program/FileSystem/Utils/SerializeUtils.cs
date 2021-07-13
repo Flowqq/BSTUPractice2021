@@ -91,17 +91,17 @@ namespace Program
             return Convert.ToBoolean(fileStream.ReadByte());
         }
 
-        public static string GenerateId()
+        public static List<byte> DateTimeToByte(DateTime val)
         {
-            var maxChar = Convert.ToChar(121);
-            var minChar = Convert.ToChar(48);
-            var idChars = new char[32];
-            var rnd = new Random();
-            for (int i = 0; i < idChars.Length; i++)
-            {
-                idChars[i] = Convert.ToChar(rnd.Next(121 - 48) + 48);
-            }
-            return new string(idChars);
+            return new List<byte>(BitConverter.GetBytes(val.Ticks));
+        }
+
+        public static DateTime ReadNextDateTime(FileStream fileStream)
+        {
+            var dateBuffer = new byte[8];
+            fileStream.Read(dateBuffer, 0, dateBuffer.Length);
+            var ticks = BitConverter.ToInt64(dateBuffer);
+            return new DateTime(ticks);
         }
     }
 }
