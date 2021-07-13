@@ -7,18 +7,28 @@ namespace Program
 {
     public class DataUnit : IComparable
     {
-        public string Id { get; set; }
+        public string Id { get; }
         public List<DataUnitProp> Props { get; }
+        
+        public DateTime CreationTime { get; }
 
         public DataUnit(string id)
         {
             Id = id;
             Props = new List<DataUnitProp>();
+            CreationTime = DateTime.Now;
         }
         public DataUnit(string id, List<DataUnitProp> props)
         {
             Id = id;
             Props = props;
+            CreationTime = DateTime.Now;
+        }
+        protected DataUnit(string id, List<DataUnitProp> props, DateTime creationTime)
+        {
+            Id = id;
+            Props = props;
+            CreationTime = creationTime;
         }
         public void Update(SortedSet<DataUnitProp> updatedProps)
         {
@@ -70,6 +80,7 @@ namespace Program
         {
             var bytes = new List<byte>();
             bytes.AddRange(SerializeUtils.StringToBytes(Id));
+            bytes.AddRange(SerializeUtils.DateTimeToByte(CreationTime));
             var propsCount = Props.Count;
             bytes.Add(SerializeUtils.IntToByte(propsCount));
             foreach (var prop in Props)
@@ -82,6 +93,7 @@ namespace Program
         public static DataUnit Deserialize(FileStream fileStream)
         {
             var id = SerializeUtils.ReadNextString(fileStream);
+            var creationTime = SerializeUtils.ReadNextDateTime(fileStream);
             var propsCount = SerializeUtils.ReadNextInt(fileStream);
             var props = new List<DataUnitProp>();
             for (var i = 0; i < propsCount; i++)
@@ -89,7 +101,7 @@ namespace Program
                 var prop = DataUnitPropFactory.DeserializeDataUnit(fileStream);
                 props.Add(prop);
             }
-            return new DataUnit(id, props);
+            return new DataUnit(id, props, creationTime);
         }
         protected bool Equals(DataUnit other)
         {

@@ -16,10 +16,6 @@ namespace Program
             DataUnitsCount = dataUnitsCount;
         }
 
-        public Collection ToEmptyCollection()
-        {
-            return new Collection(Id, Name);
-        }
         public List<byte> Serialize()
         {
             var bytes = new List<byte>();
