@@ -5,8 +5,11 @@ namespace Program.DataPage
 {
     public abstract class Paginator<T> : IEnumerator<T>
     {
-        public T Current { get; }
-        object IEnumerator.Current => GetCurrentPageData();
+        public T Current
+        {
+            get => GetCurrentPageData();
+        }
+        object IEnumerator.Current => Current;
         protected List<T> DataPages { get; set; }
         public int CurrentPageNumber { get; protected set; }
         public int TotalPages { get; set; }
@@ -16,7 +19,7 @@ namespace Program.DataPage
         
         {
             DataPages = new List<T>();
-            CurrentPageNumber = 0;
+            CurrentPageNumber = -1;
             PageSize = pageSize;
             TotalPages = 0;
         }
@@ -37,7 +40,7 @@ namespace Program.DataPage
 
         public void Reset()
         {
-            CurrentPageNumber = 0;
+            CurrentPageNumber = -1;
         }
 
         public void Dispose()
