@@ -10,7 +10,7 @@ namespace Program
     {
         public void SaveIndexToFile(IdIndex index)
         {
-            var indexFilepath = PathUtils.GetCollectionIndexFilepath(index.ColDef);
+            var indexFilepath = PathUtils.GetCollectionIndexFilepath(index.CollectionId);
             var dirFilepath = DirUtils.GetDirPathFomFilePath(indexFilepath);
             if (!File.Exists(indexFilepath))
             {
@@ -28,7 +28,7 @@ namespace Program
             var collectionsIndexes = new List<IdIndex>();
             foreach (var colDef in colDefs)
             {
-                var indexFilepath = PathUtils.GetCollectionIndexFilepath(colDef);
+                var indexFilepath = PathUtils.GetCollectionIndexFilepath(colDef.Id);
                 var fileExists = File.Exists(indexFilepath);
                 if (fileExists)
                 {
@@ -48,7 +48,7 @@ namespace Program
 
         public void CreateIndex(CollectionDefinition collectionDefinition)
         {
-            var dirFilepath = PathUtils.GetCollectionIndexFilepath(collectionDefinition);
+            var dirFilepath = PathUtils.GetCollectionIndexFilepath(collectionDefinition.Id);
             if (Directory.Exists(dirFilepath))
             {
                 Directory.CreateDirectory(dirFilepath);

@@ -9,5 +9,6 @@ namespace Program.userInterface
         List<DataUnit> LoadDataUnitsFromFile(string filepath);
         void SaveDataUnit(string filepath, DataUnit dataUnit);
         void DeleteDataUnit(string filepath, string dataUnitId);
+        public void UniteDataIndex(string parentIndexFilepath, string leftIndexPath, string rightIndexPath);
     }
 }

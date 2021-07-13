@@ -20,7 +20,18 @@ namespace Program
             RewriteDataUnitsToFile(newRightIndexPath, new List<DataUnit>(upperUnits));
             DirUtils.DeleteFile(oldIndexFilepath);
         }
-
+        
+        public void UniteDataIndex(string parentIndexFilepath, string leftIndexPath, string rightIndexPath)
+        {
+            var leftDataUnits = LoadDataUnitsFromFile(leftIndexPath);
+            var rightDataUnits = LoadDataUnitsFromFile(rightIndexPath);
+            var allDataUnits = new List<DataUnit>();
+            allDataUnits.AddRange(leftDataUnits);
+            allDataUnits.AddRange(rightDataUnits);
+            RewriteDataUnitsToFile(parentIndexFilepath, allDataUnits);
+            DirUtils.DeleteFile(leftIndexPath);
+            DirUtils.DeleteFile(rightIndexPath);
+        }
         public List<DataUnit> LoadDataUnitsFromFile(string filepath)
         {
             var fileExists = File.Exists(filepath);
@@ -69,7 +80,6 @@ namespace Program
                 RewriteDataUnitsToFile(filepath, dataUnits);
             }
         }
-
         protected void AppendDataUnitToFile(string filepath, DataUnit dataUnit)
         {
             using (var fileStream = new FileStream(filepath, FileMode.Open))
