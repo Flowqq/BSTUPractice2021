@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Program.FileSystem.Utils;
 using Program.Utils;
 
 namespace Program
@@ -11,61 +12,66 @@ namespace Program
         public string MaxId { get; }
         public string MinId { get; }
         public int MaxElements { get; }
+        public int ElementsCount
+        {
+            get
+            {
+                if (IsLeaf)
+                {
+                    return IdList.Count;
+                }
+                else
+                {
+                    return Left.ElementsCount + Right.ElementsCount;
+                }
+            }
+        }
 
         public IdIndex Left { get; protected set; }
         public IdIndex Right { get; protected set; }
         public HashSet<string> IdList { get; }
         public string FileName { get; }
-        public CollectionDefinition ColDef { get; }
-
+        public string CollectionId { get; }
         public bool IsLeaf
         {
             get => Left == null && Right == null;
         }
 
-        public IdIndex(IdIndex left, IdIndex right, string name, CollectionDefinition colDef)
+        public IdIndex(IdIndex left, IdIndex right, string fileName, string collectionId)
         {
             Left = left;
             Right = right;
             MaxId = right.MaxId;
             MinId = left.MinId;
-            FileName = name;
-            ColDef = colDef;
+            FileName = fileName;
+            CollectionId = collectionId;
         }
 
-        public IdIndex(HashSet<string> idList, string minId, string maxId, int maxElements, string fileName, CollectionDefinition colDef)
+        public IdIndex(HashSet<string> idList, string minId, string maxId, int maxElements, string fileName,
+            string collectionId)
         {
             MaxId = maxId;
             MinId = minId;
             IdList = idList;
             MaxElements = maxElements;
             FileName = fileName;
-            ColDef = colDef;
+            CollectionId = collectionId;
             Left = null;
             Right = null;
         }
         public IdIndex(CollectionDefinition colDef, int maxElements = 2)
         {
-            var maxChar = Convert.ToChar(121);
-            var minChar = Convert.ToChar(48);
-            var maxId = new char[32];
-            var minId = new char[32];
-            for (int i = 0; i < maxId.Length; i++)
-            {
-                maxId[i] = maxChar;
-                minId[i] = minChar;
-            }
-            MaxId = new string(maxId);
-            MinId = new string(minId);
+            MaxId = IdUtils.GetMaxObjId();
+            MinId = IdUtils.GetMinObjId();
             IdList = new HashSet<string>();
             MaxElements = maxElements;
             FileName = colDef.Name;
-            ColDef = colDef;
+            CollectionId = colDef.Id;
             Left = null;
             Right = null;
         }
 
-        public string GetMaxRealId()
+        public string GetRealMaxId()
         {
             if (IsLeaf)
             {
@@ -74,7 +80,7 @@ namespace Program
             throw new Exception("Can't get real max Id - index isn't leaf!");
         }
 
-        public string GetMinRealId()
+        public string GetRealMinId()
         {
             if (IsLeaf)
             {
@@ -85,11 +91,12 @@ namespace Program
 
         public string GetFilepath()
         {
-            if (IsLeaf)
+            if (!IsLeaf)
             {
+                Console.Write("WARNING! You get index filepath but this index isn't leaf!");
                 return PathUtils.GetCollectionDataFilepathByIndex(this);
             }
-            throw new Exception("Can't get index filepath - index isn't leaf!");
+            return PathUtils.GetCollectionDataFilepathByIndex(this);
         }
         public List<string> GetAllIndexesFilePaths()
         {
@@ -120,12 +127,12 @@ namespace Program
                 }
                 return Right.FindIndexFilepathByUnitId(dataUnitId);
             }
-            throw new Exception($"No DataUnit with id {dataUnitId} found in index!");
+            throw new Exception($"DataUnit id {dataUnitId} isn't in index range - [{MinId}..{MaxId}]");
         }
 
         public bool IsInRange(string id)
         {
-            return String.Compare(id, MaxId, StringComparison.Ordinal) < 0 
+            return String.Compare(id, MaxId, StringComparison.Ordinal) < 0
                    && String.Compare(id, MinId, StringComparison.Ordinal) >= 0;
         }
 
@@ -135,50 +142,86 @@ namespace Program
             var upperIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) >= 0);
             var leftFilName = FileName + "L";
             var rightFileName = FileName + "R";
-            Left = new IdIndex(new HashSet<string>(loverIds), MinId, midId, MaxElements, leftFilName, ColDef);
-            Right = new IdIndex(new HashSet<string>(upperIds), midId, MaxId, MaxElements, rightFileName, ColDef);
+            Left = new IdIndex(new HashSet<string>(loverIds), MinId, midId, MaxElements, leftFilName, CollectionId);
+            Right = new IdIndex(new HashSet<string>(upperIds), midId, MaxId, MaxElements, rightFileName, CollectionId);
             IdList.Clear();
         }
+
+        public void Unite()
+        {
+            IdList.Clear();
+            IdList.UnionWith(Left.IdList);
+            IdList.UnionWith(Right.IdList);
+            Left = null;
+            Right = null;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="dataUnitId"></param>
+        /// <returns>Индекс, кторый нужно разделить на 2</returns>
+        /// <exception cref="Exception"></exception>
         public IdIndex AddDataUnitIndex(string dataUnitId)
         {
-            if (IsInRange(dataUnitId) && IdList.Count < MaxElements)
+            if (IsInRange(dataUnitId))
             {
-                IdList.Add(dataUnitId);
-                return null;
-            }
-            else if (IdList.Count == MaxElements)
-            {
-                IdList.Add(dataUnitId);
-                return this;
-            }
-            else if (IsInRange(dataUnitId) && !IsLeaf)
-            {
-                if (Left.IsInRange(dataUnitId))
+                if (ElementsCount < MaxElements)
                 {
-                    return Left.AddDataUnitIndex(dataUnitId);
+                    IdList.Add(dataUnitId);
+                    return null;
                 }
-                return Right.AddDataUnitIndex(dataUnitId);
+                else if (IdList.Count == MaxElements)
+                {
+                    IdList.Add(dataUnitId);
+                    return this;
+                }
+                else if (!IsLeaf)
+                {
+                    if (Left.IsInRange(dataUnitId))
+                    {
+                        return Left.AddDataUnitIndex(dataUnitId);
+                    }
+                    return Right.AddDataUnitIndex(dataUnitId);
+                }
             }
             throw new Exception($"DataUnit id {dataUnitId} isn't in index range - [{MinId}..{MaxId}]");
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="dataUnitId"></param>
+        /// <returns>Индекс, который нужно объеденить</returns>
         public IdIndex RemoveDataUnitIndex(string dataUnitId)
         {
-            if (IsInRange(dataUnitId) && IsLeaf)
+            if (IsInRange(dataUnitId))
             {
-                IdList.Remove(dataUnitId);
-                return this;
-            }
-            else if (IsInRange(dataUnitId) && !IsLeaf)
-            {
-                if (Left.IsInRange(dataUnitId))
+                if (IsLeaf)
                 {
-                    return Left.RemoveDataUnitIndex(dataUnitId);
+                    IdList.Remove(dataUnitId);
+                    return null;
                 }
-
-                return Right.RemoveDataUnitIndex(dataUnitId);
+                else if (Left.ElementsCount == 1 || Right.ElementsCount == 1)
+                {
+                    if (Left.IsInRange(dataUnitId))
+                    {
+                        Left.RemoveDataUnitIndex(dataUnitId);
+                    }
+                    else
+                    {
+                        Right.RemoveDataUnitIndex(dataUnitId);
+                    }
+                    return this;
+                }
+                else if(!IsLeaf)
+                {
+                    if (Left.IsInRange(dataUnitId))
+                    {
+                        return Left.RemoveDataUnitIndex(dataUnitId);
+                    }
+                    return Right.RemoveDataUnitIndex(dataUnitId);
+                }
             }
-            return this;
+            throw new Exception($"DataUnit id {dataUnitId} isn't in index range - [{MinId}..{MaxId}]");
         }
 
         public List<byte> Serialize()
@@ -216,7 +259,7 @@ namespace Program
             {
                 var left = Deserialize(fileStream, colDef);
                 var right = Deserialize(fileStream, colDef);
-                return new IdIndex(left, right, postfix, colDef);
+                return new IdIndex(left, right, postfix, colDef.Id);
             }
             else
             {
@@ -226,7 +269,7 @@ namespace Program
                 {
                     idList.Add(SerializeUtils.ReadNextString(fileStream));
                 }
-                return new IdIndex(idList, minId, maxId, maxElements, postfix, colDef);
+                return new IdIndex(idList, minId, maxId, maxElements, postfix, colDef.Id);
             }
         }
     }
