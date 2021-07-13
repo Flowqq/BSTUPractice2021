@@ -41,7 +41,7 @@ namespace Program
                 using (var stream = new FileStream(filepath, FileMode.Open))
                 {
                     var unitsCount = SerializeUtils.ReadNextInt(stream);
-                    for (int i = 0; i < unitsCount; i++)
+                    for (var i = 0; i < unitsCount; i++)
                     {
                         var dataUnit = DataUnit.Deserialize(stream);
                         dataList.Add(dataUnit);

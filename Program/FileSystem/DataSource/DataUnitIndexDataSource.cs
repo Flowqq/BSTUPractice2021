@@ -16,7 +16,7 @@ namespace Program
             {
                 Directory.CreateDirectory(dirFilepath);
             }
-            using (FileStream fileStream = new FileStream(indexFilepath, FileMode.Create))
+            using (var fileStream = new FileStream(indexFilepath, FileMode.Create))
             {
                 var indexerBytes = index.Serialize();
                 fileStream.Write(indexerBytes.ToArray(), 0, indexerBytes.Count);
@@ -32,7 +32,7 @@ namespace Program
                 var fileExists = File.Exists(indexFilepath);
                 if (fileExists)
                 {
-                    using (FileStream fileStream = new FileStream(indexFilepath, FileMode.Open))
+                    using (var fileStream = new FileStream(indexFilepath, FileMode.Open))
                     {
                         var index = IdIndex.Deserialize(fileStream, colDef);
                         collectionsIndexes.Add(index);

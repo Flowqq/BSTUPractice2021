@@ -9,9 +9,6 @@ namespace Program
 {
     public class IdIndex
     {
-        public string MaxId { get; }
-        public string MinId { get; }
-        public int MaxElements { get; }
         public int ElementsCount
         {
             get
@@ -20,22 +17,21 @@ namespace Program
                 {
                     return IdList.Count;
                 }
-                else
-                {
-                    return Left.ElementsCount + Right.ElementsCount;
-                }
+                return Left.ElementsCount + Right.ElementsCount;
             }
         }
-
+        public bool IsLeaf
+        {
+            get => Left == null && Right == null;
+        }
+        public string MaxId { get; }
+        public string MinId { get; }
+        public int MaxElements { get; }
         public IdIndex Left { get; protected set; }
         public IdIndex Right { get; protected set; }
         public HashSet<string> IdList { get; }
         public string FileName { get; }
         public string CollectionId { get; }
-        public bool IsLeaf
-        {
-            get => Left == null && Right == null;
-        }
 
         public IdIndex(IdIndex left, IdIndex right, string fileName, string collectionId)
         {

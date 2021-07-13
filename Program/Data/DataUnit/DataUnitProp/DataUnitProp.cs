@@ -55,7 +55,7 @@ namespace Program
             if (obj != null)
             {
                 var val = (DataUnitProp) obj;
-                return Name.CompareTo(val.Name);
+                return String.Compare(Name, val.Name, StringComparison.Ordinal);
             }
             else
             {

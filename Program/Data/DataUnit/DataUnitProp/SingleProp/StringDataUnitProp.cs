@@ -13,13 +13,13 @@ namespace Program
         {
         }
 
-        protected  override List<byte> SerializeValue()
+        protected override List<byte> SerializeValue()
         {
             var val = (string) Value;
             return SerializeUtils.StringToBytes(val);
         }
 
-        protected  override object DeserializeValue(FileStream fileStream)
+        protected override object DeserializeValue(FileStream fileStream)
         {
             return SerializeUtils.ReadNextString(fileStream);
         }

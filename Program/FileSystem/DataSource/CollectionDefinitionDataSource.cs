@@ -14,10 +14,10 @@ namespace Program.userInterface
             if (fileExists)
             {
                 var definitions = new List<CollectionDefinition>();
-                using (FileStream fileStream = new FileStream(filepath, FileMode.Open))
+                using (var fileStream = new FileStream(filepath, FileMode.Open))
                 {
                     var defsCount = SerializeUtils.ReadNextInt(fileStream);
-                    for (int i = 0; i < defsCount; i++)
+                    for (var i = 0; i < defsCount; i++)
                     {
                         var definition = CollectionDefinition.Deserialize(fileStream);
                         definitions.Add(definition);
@@ -67,7 +67,7 @@ namespace Program.userInterface
             {
                 DirUtils.CreateDirsForFile(FileSystemConfig.COLLECTION_DEFS_FILEPATH);
             }
-            using (FileStream fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Create))
+            using (var fileStream = new FileStream(FileSystemConfig.COLLECTION_DEFS_FILEPATH, FileMode.Create))
             {
                 var bytes = new List<byte>();
                 var defsCount = collectionDefinitions.Count;

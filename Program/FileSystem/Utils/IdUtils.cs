@@ -8,43 +8,33 @@ namespace Program.FileSystem.Utils
         {
             var idChars = new char[32];
             var rnd = new Random();
-            for (int j = 0; j < 8; j++)
+            for (var i = 0; i < 32; i++)
             {
-                idChars[j] = (char)rnd.Next( 'A', 'Z' + 1 );
+                var nextChar = i switch
+                {
+                    < 8 => (char) rnd.Next('A', 'Z' + 1),
+                    < 16 => (char) rnd.Next('a', 'z' + 1),
+                    < 24 => (char) rnd.Next('0', '9' + 1),
+                    _ => (char) rnd.Next('A', 'Z' + 1)
+                };
+                idChars[i] = nextChar;
             }
-            for (int j = 8; j < 16; j++)
-            {
-                idChars[j] = (char)rnd.Next( 'a', 'z' + 1 );
-            }
-            for (int j = 16; j < 24; j++)
-            {
-                idChars[j] = (char)rnd.Next( '0', '9' + 1 );
-            }
-            for (int j = 24; j < 32; j++)
-            {
-                idChars[j] = (char)rnd.Next( 'A', 'Z' + 1 );
-            }
-            
             return new string(idChars);
         }
+
         public static string GetMinObjId()
         {
             var idChars = new char[32];
-            for (int j = 0; j < 8; j++)
+            for (var i = 0; i < 32; i++)
             {
-                idChars[j] = 'A';
-            }
-            for (int j = 8; j < 16; j++)
-            {
-                idChars[j] = 'a';
-            }
-            for (int j = 16; j < 24; j++)
-            {
-                idChars[j] = '0';
-            }
-            for (int j = 24; j < 32; j++)
-            {
-                idChars[j] = 'A';
+                var nextChar = i switch
+                {
+                    < 8 => 'A',
+                    < 16 => 'a',
+                    < 24 => '0',
+                    _ => 'A'
+                };
+                idChars[i] = nextChar;
             }
             return new string(idChars);
         }
@@ -52,24 +42,17 @@ namespace Program.FileSystem.Utils
         public static string GetMaxObjId()
         {
             var idChars = new char[32];
-            var rnd = new Random();
-            for (int j = 0; j < 8; j++)
+            for (var i = 0; i < 32; i++)
             {
-                idChars[j] = 'Z';
+                var nextChar = i switch
+                {
+                    < 8 => 'Z',
+                    < 16 => 'z',
+                    < 24 => '9',
+                    _ => 'Z'
+                };
+                idChars[i] = nextChar;
             }
-            for (int j = 8; j < 16; j++)
-            {
-                idChars[j] = 'z';
-            }
-            for (int j = 16; j < 24; j++)
-            {
-                idChars[j] = '9';
-            }
-            for (int j = 24; j < 32; j++)
-            {
-                idChars[j] = 'Z';
-            }
-
             return new string(idChars);
         }
     }
