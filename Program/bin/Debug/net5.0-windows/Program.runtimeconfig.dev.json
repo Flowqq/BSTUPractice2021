@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\ZHIZDRA\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\ZHIZDRA\\.nuget\\packages"
+    ]
+  }
+}
