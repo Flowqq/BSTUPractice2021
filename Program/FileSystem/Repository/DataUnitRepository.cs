@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Program.Controller.interfaces;
 using Program.FileSystem.Utils;
 using Program.userInterface;
@@ -145,7 +144,7 @@ namespace Program.Controller
             var resultSet = new List<DataUnit>();
             foreach (var dataUnit in dataUnits)
             {
-                var matches = searchProps.All(searchField => dataUnit.GetProperty(searchField.Name).Value.Equals(searchField.Value));
+                var matches = dataUnit.MatchWithProps(searchProps);
                 if (matches)
                 {
                     resultSet.Add(dataUnit);

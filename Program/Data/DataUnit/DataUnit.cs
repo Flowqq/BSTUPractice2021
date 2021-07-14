@@ -30,7 +30,26 @@ namespace Program
             Props = props;
             CreationTime = creationTime;
         }
-        public void Update(SortedSet<DataUnitProp> updatedProps)
+
+        public bool MatchWithProps(List<DataUnitProp> propsToMatch)
+        {
+            var matches = propsToMatch.All(searchField =>
+            {
+                var matchingProp = GetProperty(searchField.Name);
+                if (matchingProp != null)
+                {
+                    return matchingProp.Value.Equals(searchField.Value);
+                }
+                return false;
+            });
+            return Props.Count >= propsToMatch.Count & matches;
+        }
+
+        public void RemoveProperty(string propName)
+        {
+            Props.RemoveAll(prop => prop.Name == propName);
+        }
+        public void Update(List<DataUnitProp> updatedProps)
         {
             foreach (var prop in updatedProps)
             {
@@ -54,7 +73,7 @@ namespace Program
         {
             Props.Add(dataUnitProp);
         }
-        public void AddProperties(SortedSet<DataUnitProp> dataUnitProps)
+        public void AddProperties(List<DataUnitProp> dataUnitProps)
         {
             foreach (var dataUnit in dataUnitProps)
             {
