@@ -7,8 +7,8 @@ namespace Program.userInterface
         void DivideIndexDataByTwo(string oldIndexFilepath, string newLeftIndexPath, string newRightIndexPath,
             string divideId);
         List<DataUnit> LoadDataUnitsFromFile(string filepath);
-        void SaveDataUnit(string filepath, DataUnit dataUnit);
-        void DeleteDataUnit(string filepath, string dataUnitId);
+        bool SaveDataUnit(string filepath, DataUnit dataUnit);
+        bool DeleteDataUnit(string filepath, string dataUnitId);
         public void UniteDataIndex(string parentIndexFilepath, string leftIndexPath, string rightIndexPath);
     }
 }

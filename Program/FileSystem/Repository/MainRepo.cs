@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Program.Controller;
 using Program.Controller.interfaces;
@@ -28,29 +27,24 @@ namespace Program
 
             var colDefs = CollectionDefDataSource.LoadCollectionDefinitions();
 
-            IndexRepository = new IndexRepository(colDefs, DataUnitDataSource, DataUnitIndexDataSource);
-            CollectionDefinitionRepository = new CollectionDefinitionRepository(CollectionDefDataSource, IndexRepository);
+            IndexRepository = new IndexRepository(colDefs, DataUnitIndexDataSource);
+            CollectionDefinitionRepository = new CollectionDefinitionRepository(CollectionDefDataSource);
             DataUnitRepository = new DataUnitRepository(DataUnitDataSource, IndexRepository);
         }
 
-        public List<DataUnit> LoadCollectionData(string collectionId, Comparison<DataUnit> sortFunc = null)
+        public List<DataUnit> LoadCollectionData(string collectionId)
         {
-            var dataUnits = DataUnitRepository.LoadCollectionData(collectionId);
-            dataUnits.Sort(sortFunc ?? throw new ArgumentNullException(nameof(sortFunc)));
-            return dataUnits;
+            return DataUnitRepository.LoadCollectionData(collectionId);
         }
 
-        public List<DataUnit> GetDataUnitsByProps(string collectionId, List<DataUnitProp> props, Comparison<DataUnit> sortFunc = null)
+        public List<DataUnit> GetDataUnitsByProps(string collectionId, List<DataUnitProp> props)
         {
-            var dataUnits = DataUnitRepository.GetDataUnitsByProps(collectionId, props);
-            dataUnits.Sort(sortFunc ?? throw new ArgumentNullException(nameof(sortFunc)));
-            return dataUnits;
+            return DataUnitRepository.GetDataUnitsByProps(collectionId, props);
         }
 
-        public List<DataUnit> GetDataUnitsByPropsAllCollections(List<DataUnitProp> props, Comparison<DataUnit> sortFunc = null)
+        public List<DataUnit> GetDataUnitsByPropsAllCollections(List<DataUnitProp> props)
         {
             var dataUnits = DataUnitRepository.GetDataUnitsByPropsAllCollections(props);
-            dataUnits.Sort(sortFunc ?? throw new ArgumentNullException(nameof(sortFunc)));
             return dataUnits;
         }
 
@@ -71,17 +65,51 @@ namespace Program
 
         public void SaveCollection(CollectionDefinition collectionDefinition)
         {
-            CollectionDefinitionRepository.SaveCollection(collectionDefinition);
+            var oldColDef = CollectionDefinitionRepository.SaveCollection(collectionDefinition);
+            try
+            {
+                IndexRepository.CreateIndex(collectionDefinition.Id);
+            }
+            catch
+            {
+                if (oldColDef != null)
+                {
+                    CollectionDefinitionRepository.SaveCollection(oldColDef);
+                }
+                else
+                {
+                    CollectionDefinitionRepository.DeleteCollection(collectionDefinition.Id);
+                }
+                throw;
+            }
         }
 
         public void CreateCollection(CollectionDefinition collectionDefinition)
         {
             CollectionDefinitionRepository.CreateCollection(collectionDefinition);
+            try
+            {
+                IndexRepository.CreateIndex(collectionDefinition.Id);
+            }
+            catch
+            {
+                CollectionDefDataSource.DeleteCollection(collectionDefinition.Id);
+                throw;
+            }
         }
 
         public void DeleteCollection(string collectionId)
         {
-            CollectionDefinitionRepository.DeleteCollection(collectionId);
+            var deletedCollection = CollectionDefinitionRepository.DeleteCollection(collectionId);
+            try
+            {
+                DataUnitRepository.DeleteAllCollectionData(collectionId);
+            }
+            catch
+            {
+                CollectionDefinitionRepository.CreateCollection(deletedCollection);
+                throw;
+            }
         }
     }
 }

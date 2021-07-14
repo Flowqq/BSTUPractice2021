@@ -54,7 +54,7 @@ namespace Program
         {
             Props.Add(dataUnitProp);
         }
-        public void AddProperties(HashSet<DataUnitProp> dataUnitProps)
+        public void AddProperties(SortedSet<DataUnitProp> dataUnitProps)
         {
             foreach (var dataUnit in dataUnitProps)
             {

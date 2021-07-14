@@ -4,8 +4,11 @@ namespace Program.userInterface
 {
     public interface IDataUnitIndexDataSource
     {
-        void SaveIndexToFile(IdIndex index);
+        void UpdateIndexFile(IdIndex index);
         public List<IdIndex> LoadIndexes(List<CollectionDefinition> colDefs);
-        void CreateIndex(CollectionDefinition collectionDefinition);
+        void CreateIndex(string collectionId);
+        public void SaveIndexToFile(string filepath, IdIndex index);
+        IdIndex LoadIndexFromFile(string filepath, string collectionId);
+
     }
 }

@@ -15,7 +15,7 @@ namespace Program.userInterface
         DataUnitsPaginator SearchDataUnits(string collectionId, List<DataUnitProp> searchFields, Comparison<DataUnit> sortFunc = null, int pageSize = 10);
         DataUnitsPaginator SearchDataUnitsAllCollections(List<DataUnitProp> searchFields, Comparison<DataUnit> sortFunc = null, int pageSize = 10);
 
-        DataUnit AddDataUnit(string collectionId, List<DataUnitProp> props);
+        DataUnit AddDataUnit(string collectionId);
         DataUnit UpdateDataUnit(string collectionId, DataUnit dataUnit);
         void DeleteDataUnit(string collectionId, string dataUnitId);
     }

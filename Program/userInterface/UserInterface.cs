@@ -8,7 +8,7 @@ namespace Program.userInterface
 {
     public class UserInterface : IUserInterface
     {
-        protected Comparison<DataUnit> DefaultDataUnitsSort = (unit, dataUnit) => unit.CompareTo(dataUnit);
+        protected Comparison<DataUnit> DefaultDataUnitsSort = (unit, dataUnit) => unit.CreationTime.CompareTo(dataUnit.CreationTime);
         protected IMainRepo MainRepo { get; }
 
         public UserInterface(IMainRepo mainRepo)
@@ -45,13 +45,14 @@ namespace Program.userInterface
         {
             sortFunc ??= DefaultDataUnitsSort;
             var dataUnits = MainRepo.LoadCollectionData(collectionId);
+            dataUnits.Sort(sortFunc);
             return new DataUnitsPaginator(pageSize, dataUnits);
         }
 
-        public DataUnit AddDataUnit(string collectionId, List<DataUnitProp> props)
+        public DataUnit AddDataUnit(string collectionId)
         {
             var id = IdUtils.GenerateId();
-            var dataUnit = new DataUnit(id, props);
+            var dataUnit = new DataUnit(id);
             MainRepo.SaveDataUnit(collectionId, dataUnit);
             return dataUnit;
         }
@@ -79,7 +80,7 @@ namespace Program.userInterface
             {
                 dataUnits = MainRepo.GetDataUnitsByProps(collectionId, searchFields);
             }
-
+            dataUnits.Sort(sortFunc);
             return new DataUnitsPaginator(pageSize, dataUnits);
         }
         
@@ -91,6 +92,7 @@ namespace Program.userInterface
                 throw new Exception("Search fields are not defined!");
             }
             var dataUnits = MainRepo.GetDataUnitsByPropsAllCollections(searchFields);
+            dataUnits.Sort(sortFunc);
             return new DataUnitsPaginator(pageSize, dataUnits);
         }
     }

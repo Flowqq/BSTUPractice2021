@@ -1,134 +1,117 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Program.Exceptions;
 using Program.userInterface;
+using Program.Utils;
 
 namespace Program
 {
     public class IndexRepository
     {
-        protected IDataUnitDataSource DataUnitDataSource { get; }
-        protected  IDataUnitIndexDataSource DataUnitIndexDataSource { get; }
+        protected IDataUnitIndexDataSource DataUnitIndexDataSource { get; }
         public List<IdIndex> AllIndexes { get; }
 
-        public IndexRepository(List<CollectionDefinition> colDefs, IDataUnitDataSource dataUnitDataSource,
+        public IndexRepository(List<CollectionDefinition> colDefs,
             IDataUnitIndexDataSource dataUnitIndexDataSource)
         {
-            DataUnitDataSource = dataUnitDataSource;
             DataUnitIndexDataSource = dataUnitIndexDataSource;
             AllIndexes = DataUnitIndexDataSource.LoadIndexes(colDefs);
         }
 
-        public void CreateIndex(CollectionDefinition collectionDefinition)
+        public void CreateIndex(string collectionId)
         {
-            var index = FindIndexByCollectionId(collectionDefinition.Id);
+            var index = FindIndexByCollectionId(collectionId);
             if (index == null)
             {
-                var newIndex = new IdIndex(collectionDefinition);
-                DataUnitIndexDataSource.CreateIndex(collectionDefinition);
-                DataUnitIndexDataSource.SaveIndexToFile(newIndex);
+                var newIndex = new IdIndex(collectionId);
+                DataUnitIndexDataSource.CreateIndex(collectionId);
+                DataUnitIndexDataSource.UpdateIndexFile(newIndex);
                 AllIndexes.Add(newIndex);
+                var firstDataFilePath = newIndex.GetAllIndexesFilePaths().FirstOrDefault();
+                DirUtils.CreateFile(firstDataFilePath);
             }
         }
 
-        public void RemoveIndex(string collectionId)
+        public IdIndex RemoveIndex(string collectionId)
         {
-            AllIndexes.RemoveAll(index => index.CollectionId == collectionId);
+            var indexToRemove = FindIndexByCollectionId(collectionId);
+            AllIndexes.Remove(indexToRemove);
+            return indexToRemove;
+        }
+        public void AddIndex(IdIndex index)
+        {
+            AllIndexes.Add(index);
         }
 
-        public string AddDataUnit(string collectionId, string dataUnitId)
+        public IdIndex AddDataUnit(string collectionId, string dataUnitId)
         {
-            var index = FindIndexByCollectionId(collectionId);
-            if (index != null)
+            var index = FindIndexByCollectionIdOrThrow(collectionId);
+            var indexToDivide = index.AddDataUnitIndex(dataUnitId);
+            if (indexToDivide != null)
             {
-                var indexToDivide = index.AddDataUnitIndex(dataUnitId);
-                if (indexToDivide != null)
-                {
-                    DivideIndexByTwo(indexToDivide);
-                }
-                var filepath = index.FindIndexFilepathByUnitId(dataUnitId);
-                DataUnitIndexDataSource.SaveIndexToFile(index);
-                return filepath;
+                indexToDivide.Divide();
             }
 
-            throw new Exception($"No Indexer for collection with id {collectionId} found!");
+            DataUnitIndexDataSource.UpdateIndexFile(index);
+            return indexToDivide;
         }
 
-        public void RemoveDataUnit(string collectionId, string dataUnitId)
+        public IdIndex RemoveDataUnit(string collectionId, string dataUnitId)
         {
-            var index = FindIndexByCollectionId(collectionId);
-            if (index != null)
+            var index = FindIndexByCollectionIdOrThrow(collectionId);
+            var indexToUnite = index.RemoveDataUnitIndex(dataUnitId);
+            if (indexToUnite != null)
             {
-                var indexToUnite = index.RemoveDataUnitIndex(dataUnitId);
-                if (indexToUnite != null)
-                {
-                    UniteTwoIndex(indexToUnite);
-                }
-                DataUnitIndexDataSource.SaveIndexToFile(index);
+                indexToUnite.Unite();
             }
-            else
-            {
-                throw new Exception($"No Indexer for collection with id {collectionId} found!");
-            }
+
+            DataUnitIndexDataSource.UpdateIndexFile(index);
+            return indexToUnite;
         }
 
         public List<string> GetAllIndexesDataFilePaths(string collectionId)
         {
-            var index = FindIndexByCollectionId(collectionId);
-            if (index != null)
-            {
-                return index.GetAllIndexesFilePaths();
-            }
-            throw new Exception($"No indexer find for collection with id {collectionId}!");
+            var index = FindIndexByCollectionIdOrThrow(collectionId);
+            return index.GetAllIndexesFilePaths();
         }
 
         public string GetDataUnitIndexFilepath(string collectionId, string dataUnitId)
         {
-            var index = FindIndexByCollectionId(collectionId);
-            if (index != null)
-            {
-                return index.FindIndexFilepathByUnitId(dataUnitId);
-            }
-            throw new Exception($"No index for collection with id {collectionId} found!");
+            var index = FindIndexByCollectionIdOrThrow(collectionId);
+            return index.FindIndexFilepathByUnitId(dataUnitId);
         }
 
         protected IdIndex FindIndexByCollectionId(string collectionId)
         {
             return AllIndexes.FirstOrDefault(indexer => indexer.CollectionId == collectionId);
         }
-        protected void DivideIndexByTwo(IdIndex indexToDivide)
-        {
-            var midId = SubIds(indexToDivide.GetRealMaxId(), indexToDivide.GetRealMinId());
-            var dataFilepath = indexToDivide.GetFilepath();
-            indexToDivide.Divide(midId);
-            var leftFilepath = indexToDivide.Left.GetFilepath();
-            var rightFilepath = indexToDivide.Right.GetFilepath();
-            DataUnitDataSource.DivideIndexDataByTwo(dataFilepath, leftFilepath, rightFilepath, midId);
-        }
 
-        protected void UniteTwoIndex(IdIndex indexToUnite)
+        protected  IdIndex FindIndexByCollectionIdOrThrow(string collectionId)
         {
-            var dataFilepath = indexToUnite.GetFilepath();
-            var leftFilepath = indexToUnite.Left.GetFilepath();
-            var rightFilepath = indexToUnite.Right.GetFilepath();
-            DataUnitDataSource.UniteDataIndex(dataFilepath, leftFilepath, rightFilepath);
-            indexToUnite.Unite();
-        }
-
-        protected string SubIds(string firstId, string secId)
-        {
-            var firstIdBytes = SerializeUtils.StringToBytes(firstId);
-            var secIdBytes = SerializeUtils.StringToBytes(secId);
-            var bytes = new List<byte>();
-            for (var i = 1; i < firstIdBytes.Count; i++)
+            var index = FindIndexByCollectionId(collectionId);
+            if (index != null)
             {
-                var fByte = Convert.ToInt32(firstIdBytes[i]);
-                var sByte = Convert.ToInt32(secIdBytes[i]);
-                bytes.Add(SerializeUtils.IntToByte((fByte + sByte) / 2));
+                return index;
             }
 
-            return new UTF8Encoding().GetString(bytes.ToArray());
+            throw IndexNotFoundException.GenerateException(collectionId);
+        }
+
+        public void MakeBackupOfIndex(string collectionId)
+        {
+            var index = FindIndexByCollectionIdOrThrow(collectionId);
+            var backupFilepath = PathUtils.GetIndexBackupFilepath(collectionId);
+            DataUnitIndexDataSource.SaveIndexToFile(backupFilepath, index);
+        }
+
+        public void LoadBackupOfIndex(string collectionId)
+        {
+            var index = FindIndexByCollectionIdOrThrow(collectionId);
+            var backupFilepath = PathUtils.GetIndexBackupFilepath(collectionId);
+            var loadedIndex = DataUnitIndexDataSource.LoadIndexFromFile(backupFilepath, collectionId);
+            AllIndexes.Remove(index);
+            AllIndexes.Add(loadedIndex);
+            DataUnitIndexDataSource.UpdateIndexFile(loadedIndex);
         }
     }
 }

@@ -6,6 +6,6 @@ namespace Program.userInterface
     {
         List<CollectionDefinition> LoadCollectionDefinitions();
         void SaveCollectionDefinition(CollectionDefinition collectionDefinition);
-        public void DeleteCollection(string collectionId);
+        public CollectionDefinition DeleteCollection(string collectionId);
     }
 }

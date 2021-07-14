@@ -47,14 +47,18 @@ namespace Program
                         dataList.Add(dataUnit);
                     }
                 }
-
                 return dataList;
             }
-
-            throw new Exception($"No file {filepath} found for loading data units!");
+            throw new FileNotFoundException($"No file {filepath} found for loading data units!");
         }
 
-        public void SaveDataUnit(string filepath, DataUnit dataUnit)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="dataUnit"></param>
+        /// <returns>Запись сохранена как новая</returns>
+        public bool SaveDataUnit(string filepath, DataUnit dataUnit)
         {
             var dataUnits = LoadDataUnitsFromFile(filepath);
             var dataUnitToSave = dataUnits.Find(unit => unit.Id == dataUnit.Id);
@@ -63,14 +67,22 @@ namespace Program
                 dataUnits.Remove(dataUnitToSave);
                 dataUnits.Add(dataUnit);
                 RewriteDataUnitsToFile(filepath, dataUnits);
+                return false;
             }
             else
             {
                 AppendDataUnitToFile(filepath, dataUnit);
+                return true;
             }
         }
 
-        public void DeleteDataUnit(string filepath, string dataUnitId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="dataUnitId"></param>
+        /// <returns>Запись была удалена</returns>
+        public bool DeleteDataUnit(string filepath, string dataUnitId)
         {
             var dataUnits = LoadDataUnitsFromFile(filepath);
             var dataUnitToDelete = dataUnits.Find(unit => unit.Id == dataUnitId);
@@ -78,7 +90,9 @@ namespace Program
             {
                 dataUnits.Remove(dataUnitToDelete);
                 RewriteDataUnitsToFile(filepath, dataUnits);
+                return true;
             }
+            return false;
         }
         protected void AppendDataUnitToFile(string filepath, DataUnit dataUnit)
         {
@@ -118,7 +132,6 @@ namespace Program
                 {
                     bytes.AddRange(dataUnit.Serialize());
                 }
-
                 stream.Write(bytes.ToArray(), 0, bytes.Count);
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Program.Exceptions;
 using Program.FileSystem.Utils;
 using Program.Utils;
 
@@ -41,6 +42,7 @@ namespace Program
             MinId = left.MinId;
             FileName = fileName;
             CollectionId = collectionId;
+            IdList = new HashSet<string>();
         }
 
         public IdIndex(HashSet<string> idList, string minId, string maxId, int maxElements, string fileName,
@@ -49,20 +51,21 @@ namespace Program
             MaxId = maxId;
             MinId = minId;
             IdList = idList;
+            IdList ??= new HashSet<string>();
             MaxElements = maxElements;
             FileName = fileName;
             CollectionId = collectionId;
             Left = null;
             Right = null;
         }
-        public IdIndex(CollectionDefinition colDef, int maxElements = 2)
+        public IdIndex(string collectionId, int maxElements = 2)
         {
             MaxId = IdUtils.GetMaxObjId();
             MinId = IdUtils.GetMinObjId();
             IdList = new HashSet<string>();
             MaxElements = maxElements;
-            FileName = colDef.Name;
-            CollectionId = colDef.Id;
+            FileName = DateTime.Now.Ticks.ToString();
+            CollectionId = collectionId;
             Left = null;
             Right = null;
         }
@@ -73,7 +76,7 @@ namespace Program
             {
                 return IdList.Max();
             }
-            throw new Exception("Can't get real max Id - index isn't leaf!");
+            throw IndexLeafException.GenerateException(this);
         }
 
         public string GetRealMinId()
@@ -82,7 +85,7 @@ namespace Program
             {
                 return IdList.Min();
             }
-            throw new Exception("Can't get real min Id - index isn't leaf!");
+            throw IndexLeafException.GenerateException(this);
         }
 
         public string GetFilepath()
@@ -123,7 +126,7 @@ namespace Program
                 }
                 return Right.FindIndexFilepathByUnitId(dataUnitId);
             }
-            throw new Exception($"DataUnit id {dataUnitId} isn't in index range - [{MinId}..{MaxId}]");
+            throw IndexRangeException.GenerateException(this, dataUnitId);
         }
 
         public bool IsInRange(string id)
@@ -132,12 +135,13 @@ namespace Program
                    && String.Compare(id, MinId, StringComparison.Ordinal) >= 0;
         }
 
-        public void Divide(string midId)
+        public void Divide()
         {
+            var midId = IdUtils.SubIds(GetRealMaxId(), GetRealMinId());
             var loverIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) < 0);
             var upperIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) >= 0);
-            var leftFilName = FileName + "L";
-            var rightFileName = FileName + "R";
+            var leftFilName = FileName + FileSystemConfig.LEFT_INDEX_POSTFIX;
+            var rightFileName = FileName + FileSystemConfig.RIGHT_INDEX_POSTFIX;
             Left = new IdIndex(new HashSet<string>(loverIds), MinId, midId, MaxElements, leftFilName, CollectionId);
             Right = new IdIndex(new HashSet<string>(upperIds), midId, MaxId, MaxElements, rightFileName, CollectionId);
             IdList.Clear();
@@ -161,12 +165,12 @@ namespace Program
         {
             if (IsInRange(dataUnitId))
             {
-                if (ElementsCount < MaxElements)
+                if (IsLeaf && ElementsCount < MaxElements)
                 {
                     IdList.Add(dataUnitId);
                     return null;
                 }
-                else if (IdList.Count == MaxElements)
+                else if (IsLeaf && IdList.Count == MaxElements)
                 {
                     IdList.Add(dataUnitId);
                     return this;
@@ -180,7 +184,7 @@ namespace Program
                     return Right.AddDataUnitIndex(dataUnitId);
                 }
             }
-            throw new Exception($"DataUnit id {dataUnitId} isn't in index range - [{MinId}..{MaxId}]");
+            throw IndexRangeException.GenerateException(this, dataUnitId);
         }
 
         /// <summary>
@@ -217,7 +221,7 @@ namespace Program
                     return Right.RemoveDataUnitIndex(dataUnitId);
                 }
             }
-            throw new Exception($"DataUnit id {dataUnitId} isn't in index range - [{MinId}..{MaxId}]");
+            throw IndexRangeException.GenerateException(this, dataUnitId);
         }
 
         public List<byte> Serialize()
@@ -244,18 +248,18 @@ namespace Program
             return bytes;
         }
 
-        public static IdIndex Deserialize(FileStream fileStream, CollectionDefinition colDef)
+        public static IdIndex Deserialize(FileStream fileStream, string collectionId)
         {
             var maxElements = SerializeUtils.ReadNextInt(fileStream);
-            var postfix = SerializeUtils.ReadNextString(fileStream);
+            var fileName = SerializeUtils.ReadNextString(fileStream);
             var isLeaf = SerializeUtils.ReadNextBool(fileStream);
             var minId = SerializeUtils.ReadNextString(fileStream);
             var maxId = SerializeUtils.ReadNextString(fileStream);
             if (!isLeaf)
             {
-                var left = Deserialize(fileStream, colDef);
-                var right = Deserialize(fileStream, colDef);
-                return new IdIndex(left, right, postfix, colDef.Id);
+                var left = Deserialize(fileStream, collectionId);
+                var right = Deserialize(fileStream, collectionId);
+                return new IdIndex(left, right, fileName, collectionId);
             }
             else
             {
@@ -265,7 +269,7 @@ namespace Program
                 {
                     idList.Add(SerializeUtils.ReadNextString(fileStream));
                 }
-                return new IdIndex(idList, minId, maxId, maxElements, postfix, colDef.Id);
+                return new IdIndex(idList, minId, maxId, maxElements, fileName, collectionId);
             }
         }
     }

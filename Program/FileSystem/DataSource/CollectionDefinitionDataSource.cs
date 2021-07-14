@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using Program.Exceptions.collection;
 using Program.Utils;
 
 namespace Program.userInterface
@@ -25,7 +25,6 @@ namespace Program.userInterface
                 }
                 return definitions;
             }
-
             return new List<CollectionDefinition>();
         }
 
@@ -45,7 +44,7 @@ namespace Program.userInterface
             RewriteCollectionDefinitions(definitions);
         }
 
-        public void DeleteCollection(string collectionId)
+        public CollectionDefinition DeleteCollection(string collectionId)
         {
             var definitions = LoadCollectionDefinitions();
             var collectionToDelete = definitions.Find(def => def.Id == collectionId);
@@ -53,11 +52,9 @@ namespace Program.userInterface
             {
                 definitions.Remove(collectionToDelete);
                 RewriteCollectionDefinitions(definitions);
+                return collectionToDelete;
             }
-            else
-            {
-                throw new Exception($"Collection to delete with id {collectionId} not found!");
-            }
+            throw CollectionNotFoundException.GenerateException(collectionId);
         }
 
         protected void RewriteCollectionDefinitions(List<CollectionDefinition> collectionDefinitions)

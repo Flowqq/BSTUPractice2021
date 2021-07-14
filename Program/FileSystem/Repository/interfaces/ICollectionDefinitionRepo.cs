@@ -5,8 +5,8 @@ namespace Program.Controller.interfaces
     public interface ICollectionDefinitionRepo
     {
         public List<CollectionDefinition> LoadCollectionDefinitions();
-        public void SaveCollection(CollectionDefinition collectionDefinition);
+        public CollectionDefinition SaveCollection(CollectionDefinition collectionDefinition);
         public void CreateCollection(CollectionDefinition collectionDefinition);
-        public void DeleteCollection(string collectionId);
+        public CollectionDefinition DeleteCollection(string collectionId);
     }
 }

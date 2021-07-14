@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Program.FileSystem.Utils
 {
@@ -54,6 +56,19 @@ namespace Program.FileSystem.Utils
                 idChars[i] = nextChar;
             }
             return new string(idChars);
+        }
+        public static string SubIds(string firstId, string secId)
+        {
+            var firstIdBytes = SerializeUtils.StringToBytes(firstId);
+            var secIdBytes = SerializeUtils.StringToBytes(secId);
+            var bytes = new List<byte>();
+            for (var i = 1; i < firstIdBytes.Count; i++)
+            {
+                var fByte = Convert.ToInt32(firstIdBytes[i]);
+                var sByte = Convert.ToInt32(secIdBytes[i]);
+                bytes.Add(SerializeUtils.IntToByte((fByte + sByte) / 2));
+            }
+            return new UTF8Encoding().GetString(bytes.ToArray());
         }
     }
 }
