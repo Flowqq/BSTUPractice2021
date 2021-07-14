@@ -1,4 +1,7 @@
-﻿namespace Program
+﻿using System.Collections.Generic;
+using System.IO;
+
+namespace Program
 {
     public class CollectionDefinition
     {
@@ -13,9 +16,21 @@
             DataUnitsCount = dataUnitsCount;
         }
 
-        public Collection ToEmptyCollection()
+        public List<byte> Serialize()
         {
-            return new Collection(Id, Name);
+            var bytes = new List<byte>();
+            bytes.AddRange(SerializeUtils.StringToBytes(Id));
+            bytes.AddRange(SerializeUtils.StringToBytes(Name));
+            bytes.Add(SerializeUtils.IntToByte(DataUnitsCount));
+            return bytes;
+        }
+
+        public static CollectionDefinition Deserialize(FileStream fileStream)
+        {
+            var id = SerializeUtils.ReadNextString(fileStream);
+            var name = SerializeUtils.ReadNextString(fileStream);
+            var dataUnitsCount = SerializeUtils.ReadNextInt(fileStream);
+            return new CollectionDefinition(id, name, dataUnitsCount);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Program
@@ -6,14 +8,28 @@ namespace Program
     public class DataUnit : IComparable
     {
         public string Id { get; }
-        public SortedSet<DataUnitProp> Props { get; }
+        public List<DataUnitProp> Props { get; }
+        
+        public DateTime CreationTime { get; }
 
         public DataUnit(string id)
         {
             Id = id;
-            Props = new SortedSet<DataUnitProp>();
+            Props = new List<DataUnitProp>();
+            CreationTime = DateTime.Now;
         }
-
+        public DataUnit(string id, List<DataUnitProp> props)
+        {
+            Id = id;
+            Props = props;
+            CreationTime = DateTime.Now;
+        }
+        protected DataUnit(string id, List<DataUnitProp> props, DateTime creationTime)
+        {
+            Id = id;
+            Props = props;
+            CreationTime = creationTime;
+        }
         public void Update(SortedSet<DataUnitProp> updatedProps)
         {
             foreach (var prop in updatedProps)
@@ -34,9 +50,9 @@ namespace Program
             return Props.FirstOrDefault(prop => prop.Name == name);
         }
 
-        public bool AddProperty(DataUnitProp dataUnitProp)
+        public void AddProperty(DataUnitProp dataUnitProp)
         {
-            return Props.Add(dataUnitProp);
+            Props.Add(dataUnitProp);
         }
         public void AddProperties(HashSet<DataUnitProp> dataUnitProps)
         {
@@ -46,24 +62,46 @@ namespace Program
             }
         }
 
-        public bool UpdateProperty(DataUnitProp dataUnitProp)
+        public void UpdateProperty(DataUnitProp dataUnitProp)
         {
-            return SetProperty(dataUnitProp.Name, dataUnitProp);
+            SetProperty(dataUnitProp.Name, dataUnitProp);
         }
-        protected bool SetProperty(string name, DataUnitProp dataUnitProp)
+        protected void SetProperty(string name, DataUnitProp dataUnitProp)
         {
             var propToUpdate = GetProperty(name);
             if (propToUpdate != null)
             {
-                bool removed = Props.Remove(propToUpdate);
-                bool added = Props.Add(dataUnitProp);
-                if (!added)
-                {
-                    Props.Add(propToUpdate);
-                }
-                return removed && added;
+                var removed = Props.Remove(propToUpdate);
+                Props.Add(dataUnitProp);
             }
-            return false;
+        }
+
+        public List<byte> Serialize()
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(SerializeUtils.StringToBytes(Id));
+            bytes.AddRange(SerializeUtils.DateTimeToByte(CreationTime));
+            var propsCount = Props.Count;
+            bytes.Add(SerializeUtils.IntToByte(propsCount));
+            foreach (var prop in Props)
+            {
+                bytes.AddRange(prop.Serialize());
+            }
+            return bytes;
+        }
+
+        public static DataUnit Deserialize(FileStream fileStream)
+        {
+            var id = SerializeUtils.ReadNextString(fileStream);
+            var creationTime = SerializeUtils.ReadNextDateTime(fileStream);
+            var propsCount = SerializeUtils.ReadNextInt(fileStream);
+            var props = new List<DataUnitProp>();
+            for (var i = 0; i < propsCount; i++)
+            {
+                var prop = DataUnitPropFactory.DeserializeDataUnit(fileStream);
+                props.Add(prop);
+            }
+            return new DataUnit(id, props, creationTime);
         }
         protected bool Equals(DataUnit other)
         {

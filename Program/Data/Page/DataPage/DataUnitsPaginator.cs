@@ -7,11 +7,26 @@ namespace Program.DataPage
         public DataUnitsPaginator(int pageSize, List<DataUnit> dataPages) : base(pageSize)
         {
             CurrentPageNumber = 0;
-            TotalPages = dataPages.Count / pageSize;
+            if (dataPages.Count < pageSize)
+            {
+                TotalPages = 1;
+            }
+            else
+            {
+                TotalPages = dataPages.Count / pageSize;
+            }
             var index = 0;
             for (var i = 0; i < TotalPages; i++)
             {
-                var newPage = new DataUnitsPage(new List<DataUnit>(dataPages.GetRange(index, pageSize)));
+                DataUnitsPage newPage = null;
+                if (dataPages.Count > index + pageSize)
+                {
+                    newPage = new DataUnitsPage(new List<DataUnit>(dataPages.GetRange(index, pageSize)));
+                }
+                else
+                {
+                    newPage = new DataUnitsPage(new List<DataUnit>(dataPages.GetRange(index, dataPages.Count - index)));
+                }
                 index += pageSize;
                 DataPages.Add(newPage);
             }

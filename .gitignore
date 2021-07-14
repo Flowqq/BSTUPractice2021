@@ -1,3 +1,4 @@
 ﻿.vs/*
 .idea/*
-Program/obj/*
+/Program/obj/
+/Program/bin/
