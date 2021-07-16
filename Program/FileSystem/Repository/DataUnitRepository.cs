@@ -154,11 +154,10 @@ namespace Program.Controller
         }
         protected void DivideIndexByTwo(IdIndex indexToDivide)
         {
-            var midId = IdUtils.SubIds(indexToDivide.Right.GetRealMaxId(), indexToDivide.Left.GetRealMinId());
             var dataFilepath = indexToDivide.GetFilepath();
             var leftFilepath = indexToDivide.Left.GetFilepath();
             var rightFilepath = indexToDivide.Right.GetFilepath();
-            DataUnitDataSource.DivideIndexDataByTwo(dataFilepath, leftFilepath, rightFilepath, midId);
+            DataUnitDataSource.DivideIndexDataByTwo(dataFilepath, leftFilepath, rightFilepath);
         }
 
         protected void UniteTwoIndex(IdIndex indexToUnite)

@@ -5,9 +5,27 @@
     <Compile Update="CollectionWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="FieldCreationWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="FieldUpdateWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="SearchWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="CollectionWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="FieldCreationWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="FieldUpdateWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="SearchWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

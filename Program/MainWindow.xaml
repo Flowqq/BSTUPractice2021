@@ -9,9 +9,10 @@
     <Grid>
         <Button x:Name="CreateCollectionButton" Content="Create collection" HorizontalAlignment="Left" Margin="428,21,0,0" VerticalAlignment="Top" Height="39" Width="139" FontSize="16" Click="CreateCollectionButton_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="33,21,0,0" Text="Collections" TextWrapping="Wrap" VerticalAlignment="Top" Height="39" Width="118" FontSize="22"/>
-        <ListBox x:Name="CollectionsList" Margin="0,77,0,75" BorderBrush="{x:Null}"/>
-        <Button Content="Rename" HorizontalAlignment="Left" Margin="355,626,0,0" VerticalAlignment="Top" Height="28" Width="97" Click="RenameCollection"/>
-        <Button Content="Delete" HorizontalAlignment="Left" Margin="480,627,0,0" VerticalAlignment="Top" Height="27" Width="97" Click="DeleteCollection"/>
+        <ListBox x:Name="CollectionsList" Margin="0,77,0,82" BorderBrush="{x:Null}"/>
+        <Button Content="Rename" HorizontalAlignment="Left" Margin="355,618,0,0" VerticalAlignment="Top" Height="28" Width="97" Click="RenameCollection"/>
+        <Button Content="Delete" HorizontalAlignment="Left" Margin="470,618,0,0" VerticalAlignment="Top" Height="27" Width="97" Click="DeleteCollection"/>
+        <Button Content="Search" HorizontalAlignment="Left" Margin="43,618,0,0" VerticalAlignment="Top" Height="27" Width="108" Click="SearchButtonClick"/>
 
 
     </Grid>

@@ -9,18 +9,31 @@ namespace Program
 {
     public class DataUnitDataSource : IDataUnitDataSource
     {
-        public void DivideIndexDataByTwo(string oldIndexFilepath, string newLeftIndexPath, string newRightIndexPath,
-            string divideId)
+        public void DivideIndexDataByTwo(string oldIndexFilepath, string newLeftIndexPath, string newRightIndexPath)
         {
             var dataUnits = LoadDataUnitsFromFile(oldIndexFilepath);
-            var loverUnits = dataUnits.Where(unit => String.Compare(unit.Id, divideId, StringComparison.Ordinal) < 0);
-            var upperUnits = dataUnits.Where(unit => String.Compare(unit.Id, divideId, StringComparison.Ordinal) >= 0);
+            dataUnits.Sort((firstUnit, secUnit) => String.Compare(firstUnit.Id, secUnit.Id, StringComparison.Ordinal));
+            var loverUnits = new List<DataUnit>();
+            var upperUnits = new List<DataUnit>();
+            var counter = 0;
+            foreach (var unit in dataUnits)
+            {
+                if (counter < dataUnits.Count / 2)
+                {
+                    loverUnits.Add(unit);
+                }
+                else
+                {
+                    upperUnits.Add(unit);
+                }
+                counter++;
+            }
 
             RewriteDataUnitsToFile(newLeftIndexPath, new List<DataUnit>(loverUnits));
             RewriteDataUnitsToFile(newRightIndexPath, new List<DataUnit>(upperUnits));
             DirUtils.DeleteFile(oldIndexFilepath);
         }
-        
+
         public void UniteDataIndex(string parentIndexFilepath, string leftIndexPath, string rightIndexPath)
         {
             var leftDataUnits = LoadDataUnitsFromFile(leftIndexPath);

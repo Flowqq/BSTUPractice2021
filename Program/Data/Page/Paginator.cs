@@ -10,7 +10,7 @@ namespace Program.DataPage
             get => GetCurrentPageData();
         }
         object IEnumerator.Current => Current;
-        protected List<T> DataPages { get; set; }
+        public List<T> DataPages { get; set; }
         public int CurrentPageNumber { get; protected set; }
         public int TotalPages { get; set; }
         public int PageSize { get; }

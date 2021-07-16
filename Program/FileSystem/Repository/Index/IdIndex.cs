@@ -58,7 +58,7 @@ namespace Program
             Left = null;
             Right = null;
         }
-        public IdIndex(string collectionId, int maxElements = 2)
+        public IdIndex(string collectionId, int maxElements = 10)
         {
             MaxId = IdUtils.GetMaxObjId();
             MinId = IdUtils.GetMinObjId();
@@ -137,9 +137,27 @@ namespace Program
 
         public void Divide()
         {
-            var midId = IdUtils.SubIds(GetRealMaxId(), GetRealMinId());
-            var loverIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) < 0);
-            var upperIds = IdList.Where(id => String.Compare(id, midId, StringComparison.Ordinal) >= 0);
+            var sortedSet = new SortedSet<string>(IdList, StringComparer.Ordinal);
+            var loverIds = new List<string>();
+            var upperIds = new List<string>();
+            var counter = 0;
+            var midId = "";
+            foreach (var id in sortedSet)
+            {
+                if (counter < sortedSet.Count / 2)
+                {
+                    loverIds.Add(id);
+                }
+                else
+                {
+                    upperIds.Add(id);
+                }
+                if (counter == sortedSet.Count / 2)
+                {
+                    midId = id;
+                }
+                counter++;
+            }
             var leftFilName = FileName + FileSystemConfig.LEFT_INDEX_POSTFIX;
             var rightFileName = FileName + FileSystemConfig.RIGHT_INDEX_POSTFIX;
             Left = new IdIndex(new HashSet<string>(loverIds), MinId, midId, MaxElements, leftFilName, CollectionId);

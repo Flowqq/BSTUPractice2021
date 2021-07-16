@@ -6,8 +6,8 @@ namespace Program
 {
     public abstract class DataUnitProp : IComparable
     {
-        public string Name { get; }
-        public object Value { get; }
+        public string Name { get; set; }
+        public object Value { get; set; }
         public DataType Type { get; }
 
         public DataUnitProp(string name, object value, DataType type)

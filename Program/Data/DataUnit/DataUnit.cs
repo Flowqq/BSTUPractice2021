@@ -81,17 +81,34 @@ namespace Program
             }
         }
 
+        /*public void UpdateProperty(DataUnitProp dataUnitProp)
+        {
+            SetProperty(dataUnitProp.Name, dataUnitProp);
+        }*/
         public void UpdateProperty(DataUnitProp dataUnitProp)
         {
             SetProperty(dataUnitProp.Name, dataUnitProp);
         }
-        protected void SetProperty(string name, DataUnitProp dataUnitProp)
+        /*protected void SetProperty(string name, DataUnitProp dataUnitProp)
         {
             var propToUpdate = GetProperty(name);
             if (propToUpdate != null)
             {
                 var removed = Props.Remove(propToUpdate);
                 Props.Add(dataUnitProp);
+            }
+        }*/
+        public void SetProperty(string oldName, DataUnitProp dataUnitProp)
+        {
+            var propToUpdate = GetProperty(oldName);
+            if (propToUpdate != null && dataUnitProp.Name != null)
+            {
+                Props.Remove(propToUpdate);
+                Props.Add(dataUnitProp);
+            }
+            else
+            {
+                AddProperty(dataUnitProp);
             }
         }
 
